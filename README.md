@@ -16,6 +16,10 @@ devicegen is free software: you can redistribute it and/or modify it under the t
 
 Please report any bug by creating an issue on the devicegen GitHub page: https://github.com/nanoacademic/devicegen/issues.
 
+## Scientific research
+
+If you use devicegen in any work leading to a scientific publication, we would love to know ! Please contact us at: info@nanoacademic.com.
+
 ## Contacting Nanoacademic Technologies
 
 The devicegen package is developed and maintain by Nanoacademic Technologies. For any question that is not a bug report, please contact us at: info@nanoacademic.com.
