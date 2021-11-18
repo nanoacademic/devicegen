@@ -2,8 +2,20 @@
 
 ## About devicegen
 
-DeviceGen is a split-gate device generator targeting mainly spin qubit applications. It enables to create Gmsh mesh files corresponding to a gate geometry defined in a GDS layout text file.
+devicegen is a split-gate device generator targeting mainly spin qubit applications. It enables to create Gmsh mesh files corresponding to a gate geometry defined in a GDS layout text file.
+
+## Community
+
+You are welcome to create new features for devicegen. To do so, please create a user-owned fork of the devicegen repository, and submit a pull request containing your modifications.
 
 ## Copyright
 
-DeviceGen is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. See the file COPYING in http://www.gnu.org/licenses/, for a description of the GNU General Public License terms under which you can copy the files.
+devicegen is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version. See the file COPYING in http://www.gnu.org/licenses/, for a description of the GNU General Public License terms under which you can copy the files.
+
+## Reporting bugs in devicegen
+
+Please report any bug by creating an issue on the devicegen GitHub page: https://github.com/nanoacademic/devicegen/issues.
+
+## Contacting Nanoacademic Technologies
+
+The devicegen package is developed and maintain by Nanoacademic Technologies. For any question that is not a bug report, please contact us at: info@nanoacademic.com.
