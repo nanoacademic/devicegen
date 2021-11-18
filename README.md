@@ -2,7 +2,7 @@
 
 ## About devicegen
 
-devicegen is a split-gate device generator targeting mainly spin qubit applications. It enables to create Gmsh mesh files corresponding to a gate geometry defined in a GDS layout text file.
+devicegen is a gated quantum dot device generator targeting mainly spin qubit applications. It enables to create Gmsh mesh files corresponding to a gate geometry defined in a GDS layout text file.
 
 ## Community
 
