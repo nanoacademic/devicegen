@@ -23,3 +23,7 @@ If you use devicegen in any work leading to a scientific publication, we would l
 ## Contacting Nanoacademic Technologies
 
 The devicegen package is developed and maintain by Nanoacademic Technologies. For any question that is not a bug report, please contact us at: info@nanoacademic.com.
+
+## About Gmsh
+
+devicegen builds on the Gmsh, "an open source 3D finite element mesh generator with a built-in CAD engine and post-processor", which is released under the GPL license. For more information on Gmsh, please visit: https://gmsh.info/.
