@@ -1,0 +1,9 @@
+name: device_gen
+channels:
+- defaults
+- conda-forge
+dependencies:
+- python=3.8
+- pip >= 20.0.2
+- gmsh
+
