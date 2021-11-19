@@ -5,10 +5,20 @@
 `devicegen` is a gated-quantum-dot device generator targeting. It facilitates the creation of `Gmsh` mesh files corresponding to a gate geometry defined in a GDS layout text file.
 
 ## Installation
-To install `devicegen` run:
+
+To install `devicegen`, we recommend first creating the `device_gen` environment with `conda` using:
+
 ```bash
-pip install .
+$ conda env create -f environment.yml
+$ conda activate device_gen
 ```
+
+and then running:
+
+```bash
+$ pip install .
+```
+
 in the devicegen repository.
 
 ## Community
