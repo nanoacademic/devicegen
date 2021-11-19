@@ -2,7 +2,6 @@
 
 ## About devicegen
 
-<<<<<<< HEAD
 `devicegen` is a gated-quantum-dot device generator targeting. It facilitates the creation of `Gmsh` mesh files corresponding to a gate geometry defined in a GDS layout text file.
 
 ## Installation
@@ -21,9 +20,6 @@ $ pip install .
 ```
 
 in the devicegen repository.
-=======
-devicegen is a gated quantum dot device generator targeting mainly spin qubit applications. It enables to create Gmsh mesh files corresponding to a gate geometry defined in a GDS layout text file.
->>>>>>> 87d15396486fe9383c47712af6bd5f06940d9a68
 
 ## Community
 
