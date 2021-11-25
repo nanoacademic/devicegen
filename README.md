@@ -2,7 +2,7 @@
 
 ## About devicegen
 
-`devicegen` is a gated-quantum-dot device generator targeting. It facilitates the creation of `Gmsh` mesh files corresponding to a gate geometry defined in a GDS layout text file.
+`devicegen` is a gated heterostructure device generator. It facilitates the creation of `Gmsh` mesh files corresponding to a gate geometry defined in a GDS layout text file.
 
 ## Installation
 
