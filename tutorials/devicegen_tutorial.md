@@ -13,7 +13,13 @@
 
 ## Briefing
 
-The aim of this tutorial is to demonstrate how the devicegen can be used to accelerate the generation of meshes appropriate for modelling semiconductor nanodevices. Here, the demonstration is made for a gated quantum-dot system. The layout for this example device can be found [here](../examples/layouts/gated_qd.gds). This layout file is in .gds format and can be visualized and modified using, e.g. [KLayout](https://www.klayout.de/).
+The aim of this tutorial is to demonstrate how the devicegen can be used to accelerate the generation of meshes appropriate for modelling semiconductor nanodevices. Here, the demonstration is made for the following gated quantum-dot system:
+
+![gated_dot](./figs/gated_dot_example/device_to_build.png)
+
+The left-hand side of the above figure shows the layout for this example device, which can be found [here](../examples/layouts/gated_qd.gds). This layout file is in .gds format and can be visualized and modified using, e.g. [KLayout](https://www.klayout.de/). In the above picture, the red rectangle represents the simulation domain, while the blue rectangles represent metallic gates deposited on top of the chip that are used to control the confinement potential used to achieve confinement of single charge carriers in the *xOy* plane.
+
+The right-hand side of the above figure illustrates the heterostructure stack, i.e., the multiple layers of materials used to confine charge carriers in the *z* direction. Each layer will be labeled differently to represent the role it plays in the heterostructure, and will be assigned a certain number of mesh layers depending on how accurate the simulation should be in each region. In this example, the mismatch between conduction band edges of GaAs and AlGaAs is used to form a `barrier` isolating electrons in the substrate from the `cap` region, and an `n-doped layer` is used to bend the conduction band edge and form a triangular confinement potential in the region indicated as `2DEG` in the above figure.
 
 ## Setup
 
