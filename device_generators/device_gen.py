@@ -23,17 +23,17 @@ class DeviceGenerator:
         surface of the layout
     dot_tag (list): Tags of bottom most surfaces in x-y plane where we expect
         electrons/holes to be localized.
-    dot_volume (list): Contains the tags of the different volumes that we expect
-        to contain dots.
+    dot_volume (list): Contains the tags of the different volumes that we 
+        expect to contain dots.
     dot_counter (int): counter for dots created. Used for generating names of
         physical groups for dots.
     field_counter (int): counter for mesh fields created.
-    scale (scalar): Factor by which node coordinates are multiplied for conversion 
-        to SI units.
-    material_dict (dictionary): Contains the material properties of each physical volume
-        of the generated mesh/device 
-    bnd_dict (dictionary): Contains the boundary conditions that are to be enforced for 
-        the generated mesh/device 
+    scale (scalar): Factor by which node coordinates are multiplied for 
+        conversion to SI units.
+    material_dict (dictionary): Contains the material properties of each 
+        physical volume of the generated mesh/device 
+    bnd_dict (dictionary): Contains the boundary conditions that are to be 
+        enforced for the generated mesh/device 
 
     Methods:
     ---
@@ -229,27 +229,28 @@ class DeviceGenerator:
         # Synchronize
         gmsh.model.occ.synchronize()
 
-    def new_layer(self, thickness, npts=10, label=None, dot_region=False, dot_label=None,
-        material=None, pdoping=0, ndoping=0):
+    def new_layer(self, thickness, npts=10, label=None, dot_region=False, 
+        dot_label=None, material=None, pdoping=0, ndoping=0):
         """ Creates a layer by extruding the bottom-most surface.
 
         Args:
         ---
         thickness (scalar): Thickness of the new layer.
         npts (int): number of points along the extruded dimension. 
-        label (string): Label (physical name) for the layer. If None, generic name used,
-            e.g. 'Volume1'
-        dot_region (boolean): If True, will consider the volume when creating the 
-            dot region under the 'dot_rectangles'
-        dot_label (string): Physical name for the dot region in the given layer. If
-            None, a generic name is used.
-        material (material object): Material the dot region is made of. To be used if 
-            the goal is to create a device. Defaults to silicon.
+        label (string): Label (physical name) for the layer. If None, generic 
+            name used, e.g. 'Volume1'
+        dot_region (boolean): If True, will consider the volume when creating 
+            the dot region under the 'dot_rectangles'
+        dot_label (string): Physical name for the dot region in the given 
+            layer. If None, a generic name is used.
+        material (material object): Material the dot region is made of. To be 
+            used if the goal is to create a device. Defaults to silicon.
+            The material object may be a string, or an object used in an 
+            external finite element library to specify materials.
         pdoping (scalar): The density of acceptors in cm^-3.
                 Default: 0.
         ndoping (scalar): The density of donors in cm^-3.
                 Default: 0.
-
         """
 
         self.first_layer = False

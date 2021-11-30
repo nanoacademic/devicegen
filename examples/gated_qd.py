@@ -2,19 +2,19 @@ from device_generators.device_gen import DeviceGenerator
 import os
 
 # Constants
-# # characteristic lengths
+## Mesh characteristic lengths
 char_len = 15 * 1e-3
 dot_char_len = char_len/2
 
-# # z dimensions
-# # # Thickness of each material layer
+## z dimensions
+### Thickness of each material layer
 cap_thick = 10 * 1e-3
 barrier_thick = 25 * 1e-3
 dopant_thick = 5 * 1e-3
 two_deg_thick = 5 * 1e-3
 substrate_thick = 100 * 1e-3 - two_deg_thick
 
-# # # Number of mesh points along growth axis
+### Number of mesh points along growth axis
 cap_layers = 10
 barrier_layers = 5
 dopant_layers = 10
