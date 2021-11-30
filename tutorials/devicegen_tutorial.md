@@ -30,11 +30,11 @@ The first import is the `DeviceGenerator`, while the second is the standard pyth
 
 ### Constants
 
-Next we define some constants that will be useful in setting up the device in the subsequent steps
+Next we define some constants that will be useful in setting up the device in the subsequent steps. All lengths are given in micrometers, so that we convert from nanometers to micrometers by multiplying by 1e-3.
 
 ```python
 # Constants
-# # characteristic lengths
+# # Mesh characteristic lengths
 char_len = 15 * 1e-3
 dot_char_len = char_len/2
 
@@ -56,7 +56,7 @@ substrate_layers = 10
 
 ### Load layout
 
-The final step of the setup is to load the layout of the device in the `DeviceGenerator`. The layout can be imported as either a .geo file or a .gds file saved with the .txt extension. In this example we will load the gds file found [here](../examples/layouts/gated_qd.gds)
+The final step of the setup is to load the layout of the device in the `DeviceGenerator`. The layout can be imported as either a .geo file or a .gds file saved with the .txt extension. In this example we will load the gds file found [here](../examples/layouts/gated_qd.gds). Saving a layout into gds text files should be straightforward with most layout editors. For example, in KLayout, this is done using File > Save As by selecting GDS2 Text files in the drop-down menu `'Type'` under the file name field.
 
 ``` python
 # Initializing the DeviceGenerator
@@ -89,7 +89,7 @@ dG.new_dot_rectangle(dot_xmin, dot_ymin, dot_len_x, dot_len_y,
     h=dot_char_len)
 ```
 
-This method has four arguments and an optional argument. The arguments are the minimal x and y values of the 'dot rectangle' and its length in the x and y directions. In this example, these are given by the constants: `dot_xmin`,  `dot_ymin`, `dot_len_x`, and `dot_len_y`, respectively. The units of length used by the device generator are microns. Finally there is also the optional input `h` which sets the characteristic length of the mesh within the dot rectangle.
+This method has four arguments and an optional argument. The arguments are the minimal x and y values of the 'dot rectangle' and its length in the x and y directions. In this example, these are given by the constants: `dot_xmin`,  `dot_ymin`, `dot_len_x`, and `dot_len_y`, respectively. Recall that the units of length used by the device generator are microns. Finally there is also the optional input `h` which sets the characteristic length of the mesh within the dot rectangle.
 
 Again, we can visualize the model thus far with the `view` method.
 
@@ -100,11 +100,11 @@ dG.view()
 
 ![layout](./figs/gated_dot_example/layout_dot_rect.png)
 
-The `DeviceGenerator` has added a rectangular surface to the layout. Another by product of using the `DeviceGenerator` is that all the surfaces have been attributed a name (physical name for those familiar with gmsh). To see the names of each surfacesNow that all the surfaces are added we can select `Tools > Options`:
+The `DeviceGenerator` has added a rectangular surface to the layout. Another byproduct of using the `DeviceGenerator` is that all the surfaces have been attributed a name (physical name for those familiar with gmsh). To see the names of each surfaces we can select `Tools > Options`:
 
 ![tools>options](./figs/gated_dot_example/tools_options.png)
 
-The following window shoudl pop up:
+The following window should pop up:
 
 ![geometry](./figs/gated_dot_example/geometry.png)
 
@@ -166,7 +166,7 @@ dG.new_layer(substrate_thick, substrate_layers, label='substrate',
 dG.view()
 ```
 
-This method has two inputs that indicate how thick each layer is and now fine the mesh is within that layer along the growth direction. This second input is given as an integer which tells the gmsh `extrude` function how many times to copy the layout along the growth direction to create the mesh (see [here](https://gitlab.onelab.info/gmsh/gmsh/-/blob/gmsh_4_8_4/tutorial/python/t2.py) for more details). The optional `label` input allows us to label the volume created by the layer. For some layer we have also specified `dot_region = True` and given a `dot_label`. These optional inputs allow us to separate the dot region in the layers from the rest of the layer and give the dot region a separate label. This could be useful, e.g. if we only want to refine the mesh within a dot region. The `new_layer` method has multiple additional optional inputs that all users to add metadata (such as the material and the doping) to each volume (see [device_gen.py](../device_generators/device_gen.py) for more details).
+This method has two inputs that indicate how thick each layer is and how fine the mesh is within this layer along the growth direction. This second input is given as an integer which tells the gmsh `extrude` function how many times to copy the layout along the growth direction to create the mesh (see [here](https://gitlab.onelab.info/gmsh/gmsh/-/blob/gmsh_4_8_4/tutorial/python/t2.py) for more details). The optional `label` input allows us to label the volume created by the layer. For some layers we have also specified `dot_region = True` and given a `dot_label`. These optional inputs allow us to separate the dot region in the layers from the rest of the layer and give the dot region a separate label. This could be useful, e.g. if we want to model the dot region differently from the rest of the device (e.g., treating the dot region quantum mechanically but the rest of the device classically). The `new_layer` method has multiple additional optional inputs that may be used to add metadata (such as the material and the doping) to each volume (see [device_gen.py](../device_generators/device_gen.py) for more details).
 
 Following the same steps as when we wanted to display the surface labels, we can also display volume labels. Using the `gmsh` GUI to move around and zoom, it should be clear that the dot volumes in the `dopant`, `two_deg`, and `substrate` layers have a separate name.
 
@@ -188,7 +188,7 @@ This method will label the bottom surface with the string given to it as input.
 
 ## Saving the mesh
 
-Finally, we can save the generated from the instructions above to the disk using the `save_mesh` method
+Finally, we can save the mesh generated from the instructions above to the disk using the `save_mesh` method
 
 ```python
 # Save mesh
