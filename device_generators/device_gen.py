@@ -267,7 +267,10 @@ class DeviceGenerator:
             label=dot_label, material=material, pdoping=pdoping, ndoping=ndoping)
 
         # Tags of all volumes part of dot volume
-        flat_dot_vol = functools.reduce(operator.iconcat, self.dot_volume, [])
+        def flatten(l):
+            """Flattens a list of lists"""
+            return functools.reduce(operator.iconcat, l, [])
+        flat_dot_vol = flatten(flatten(self.dot_volume))
 
         # Check which are not part of dot volumes
         V = [e for e in extr_surf if e[0]==3] # Volumes generated from extrusion
