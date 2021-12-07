@@ -263,7 +263,7 @@ class DeviceGenerator:
         # keep track of bottom surfaces in case an additional layer is added
         self.bottom_surface = self.track_surface(extr_surf)
         # Update regions related to dots    
-        self._update_dot_region(self.dot_tag, self.dot_volume, extr_surf, dot_region, 
+        self._update_dot_vol(self.dot_tag, self.dot_volume, extr_surf, dot_region, 
             label=dot_label, material=material, pdoping=pdoping, ndoping=ndoping)
 
         # Tags of all volumes part of dot volume
@@ -388,7 +388,7 @@ class DeviceGenerator:
         return surface
 
 
-    def _update_dot_region(self, dot_tags, dot_volume, extr_surf, dot_region, label=None,
+    def _update_dot_vol(self, dot_tags, dot_volume, extr_surf, dot_region, label=None,
         material=None, pdoping=0, ndoping=0):
         """ Updates the attributes dot_volume and dot_tag and labels dot region.
         Args:
@@ -420,25 +420,33 @@ class DeviceGenerator:
         # loop over all entites tagged created by the create_dot_rectangle() method
         for i, dot in enumerate(dot_tags): 
             
-            # Find Volume corresponding to dot region
+            # Find volumes corresponding to dot region
             V = [e for e in extr_surf if e[0]==3] # All volumes created
-            for v in V:
-                if (2, dot[-1]) in gmsh.model.getBoundary([v], oriented=False):
-                    vol_id = extr_surf.index(v)
-                    break
+            dot_below = dot[-1] # Entity tags for bottom most surfaces of dot
+            vol_indeces = []
+            for v in V: 
+                # Check if the dot surface is a boundary of the dot volume
+                set_dot_below = set([(2, t) for t in dot_below])
+                bndry_of_v = set(gmsh.model.getBoundary([v], oriented=False))
+                intersection = set.intersection(set_dot_below, bndry_of_v)
+                if len(list(intersection)) != 0:
+                    vol_indeces.append(extr_surf.index(v))
+            
             # Find bottom surface of volume
-            dot.append(extr_surf[vol_id - 1][1])
+            # update dot_tags
+            dot.append([extr_surf[ix - 1][1] for ix in vol_indeces])
 
             if dot_region:
                 # Include the create volume in the dot volumes
-                dot_volume[i].append(extr_surf[vol_id][1])
+                vols = [extr_surf[ix][1] for ix in vol_indeces]
+                dot_volume[i].append(vols)
 
                 if label is None:
                     dot_label = f'dot{i}-{self.layer_counter}'
                 else:
                     dot_label = label[i]
                 # Add a physical name.
-                phys_volume = gmsh.model.addPhysicalGroup(3, [extr_surf[vol_id][1]], tag=-1)
+                phys_volume = gmsh.model.addPhysicalGroup(3, vols, tag=-1)
                 gmsh.model.setPhysicalName(3, phys_volume, dot_label)
                 
                 # Store material properties
@@ -679,7 +687,7 @@ class DeviceGenerator:
         gmsh.model.occ.synchronize()
         
         # Keep track of dot tags
-        self.dot_tag.append([surf])
+        self.dot_tag.append([[surf]])
         self.dot_volume.append([])
 
         # Reset top layer
@@ -733,6 +741,33 @@ class DeviceGenerator:
 
             gmsh.model.occ.synchronize()
 
+    def _update_dot_frag(self, surf, frag_surf):
+        """ Updates the dot_tag attribute if any dot rectangle overlaps with 
+        another region. 
+
+        Args:
+        ---
+        surf (list of entity tags): Entity tags before a boolean fragment.
+        frag_surf (List of list of entity tags): The output of the
+            gmsh.model.occ.fragment method which was applied on the top surface 
+        """
+        
+        # For all dots being tracked
+        for j, dot in enumerate(self.dot_tag):
+            # entity tags for the top layer
+            tags = dot[0]
+            # Get all indeces of the dot tags before the boolean fragment
+            indeces = []
+            for i, s in enumerate(surf):
+                if s[1] in tags:
+                    indeces.append(i)
+            # Get the new entity tags after the boolean fragment
+            new = []
+            for index in indeces:
+                new += [s[1] for s in frag_surf[1][index]]
+            # Update the dot_tag attribute
+            self.dot_tag[j] = [new]
+        
 
     def setup_top_layer(self):
         """ Set up top 'mask' layer of device
@@ -755,8 +790,11 @@ class DeviceGenerator:
         surf1 = surfaces[:1]
         surf2 = surfaces[1:]
         # Use Bolean fragments
-        gmsh.model.occ.fragment(surf1, surf2)
+        frag_surf = gmsh.model.occ.fragment(surf1, surf2)
         gmsh.model.occ.synchronize()
+        
+        # Update dot tags
+        self._update_dot_frag(surfaces, frag_surf)
 
         # store surfaces as a device attribute
         self.bottom_surface = copy.deepcopy(gmsh.model.getEntities(2))
