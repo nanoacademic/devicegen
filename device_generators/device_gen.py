@@ -7,7 +7,7 @@ import gmsh
 from device_generators.gds_parser import Parser
 
 class DeviceGenerator:
-    """ Class used to generate QTCAD device objects.
+    """ Class used to generate meshes for quantum dot systems.
 
     Attributes:
     ---
@@ -284,7 +284,7 @@ class DeviceGenerator:
         gmsh.model.occ.synchronize()  
 
         # Add a physical name.
-        physical_volume = gmsh.model.addPhysicalGroup(3, volumes, tag=-1)
+        physical_volume = gmsh.model.addPhysicalGroup(3, volumes)
 
         if label is None: # generic name
             label=f'volume{self.layer_counter}'
