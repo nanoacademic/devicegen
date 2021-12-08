@@ -21,10 +21,15 @@ class DeviceGenerator:
         physical groups.
     vol_entities (dictionary): keeps track of volume entities tags under each
         surface of the layout
-    dot_tag (list): Tags of bottom most surfaces in x-y plane where we expect
-        electrons/holes to be localized.
-    dot_volume (list): Contains the tags of the different volumes that we 
-        expect to contain dots.
+    dot_tag (list of lists of lists): Tags of bottom most surfaces in x-y 
+        plane where we expect electrons/holes to be localized. The outer 
+        list goes over the different dot regions, the second layer over
+        the different physical layers and the inner list over the different
+        entities.
+    dot_volume (list of lists of lists): Contains the tags of the different
+        volumes that we expect to contain dots. The outer list goes over the 
+        different dot regions, the second layer over the different physical 
+        layers and the inner list over the different entities.
     dot_counter (int): counter for dots created. Used for generating names of
         physical groups for dots.
     field_counter (int): counter for mesh fields created.
@@ -696,6 +701,9 @@ class DeviceGenerator:
         # Reset top layer
         self.setup_top_layer()
 
+        # Increase count
+        self.dot_counter += 1
+
         return surf
 
 
@@ -770,7 +778,6 @@ class DeviceGenerator:
                 new += [s[1] for s in frag_surf[1][index]]
             # Update the dot_tag attribute
             self.dot_tag[j] = [new]
-        
 
     def setup_top_layer(self):
         """ Set up top 'mask' layer of device
