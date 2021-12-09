@@ -57,6 +57,8 @@ class DeviceGeneratorHanson(DeviceGenerator):
                                             numElements=[npts]
                                             )
 
+        gmsh.model.occ.synchronize()  
+
         # Label cap volume
         cap_vol_tag = self._label_cap_volume(extr_surf, vol_label, 
                                             material, pdoping, ndoping) 
@@ -64,7 +66,6 @@ class DeviceGeneratorHanson(DeviceGenerator):
         self._label_cap_bnd(extr_surf, cap_vol_tag, bnd_label,
                             bnd_type, **bnd_params)                                  
         
-        gmsh.model.occ.synchronize()  
 
     def _label_cap_volume(self, extr_surf, vol_label, mat, p, n):
         """ Labels the cap volume.
@@ -107,6 +108,8 @@ class DeviceGeneratorHanson(DeviceGenerator):
             'ndoping':n
             }
 
+        gmsh.model.occ.synchronize()  
+
         return cap_vol_tag
 
     def _label_cap_bnd(self, extr_surf, cap_vol_tag, bnd_label, 
@@ -138,7 +141,7 @@ class DeviceGeneratorHanson(DeviceGenerator):
         # Naming cap volume
         if bnd_label is None: # generic name
             bnd_label=f'cap_bnd'
-        gmsh.model.setPhysicalName(3, bnd_physical_surface, bnd_label)
+        gmsh.model.setPhysicalName(2, bnd_physical_surface, bnd_label)
 
         # Storing boundary conditions
         if bnd_type is not None:
@@ -146,3 +149,6 @@ class DeviceGeneratorHanson(DeviceGenerator):
                 'type': bnd_type,
                 **bnd_params
             }
+
+        gmsh.model.occ.synchronize()  
+
