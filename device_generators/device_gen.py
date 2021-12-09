@@ -62,16 +62,16 @@ class DeviceGenerator:
     get_surfaces: Get the surfaces under a surface with a given name
     """
 
-    def label_bottom(self, label, *bnd_params, bnd_type=None):
+    def label_bottom(self, label, bnd_type=None, **bnd_params):
         """ Label the bottom surface of the device
 
         Args:
         ---
         label (string): Label for the bottom surface. 
-        *bnd_params: arguments for type of boundary condition under consideration.
-            See device.py for types boundary conditions available
         bnd_type (string): Type of boundary condition to enforce. The possibilities are
-            schottky, gate, or ohmic.
+            e.g. schottky, gate, or ohmic.
+        **bnd_params: key word arguments for type of boundary condition under 
+            consideration. 
         """
         # Check that we are not trying to label the top surface
         if self.first_layer:
@@ -88,7 +88,7 @@ class DeviceGenerator:
         if bnd_type is not None:
             self.bnd_dict[label] = {
                 'type': bnd_type,
-                'params': bnd_params
+                **bnd_params
             }
 
     def label_volume(self, ent_tags, new_name, material=None, 
@@ -120,17 +120,17 @@ class DeviceGenerator:
         return new_phys_group
 
 
-    def label_surface(self, ent_tags, new_name, *bnd_params, bnd_type=None):
+    def label_surface(self, ent_tags, new_name, bnd_type=None, **bnd_params):
         """ Gives a physical name to a surface entity.
         
         Args:
         ---
         ent_tags (list): Entities to name.
         new_name (string): Phsysical name
-        *bnd_params: arguments for type of boundary condition under consideration.
-            See device.py for types boundary conditions available
-        bnd_type (string): Type of boundary condition to enforce. The 
-            possibilities are schottky, gate, or ohmic.
+        bnd_type (string): Type of boundary condition to enforce. The possibilities are
+            e.g. schottky, gate, or ohmic.
+        **bnd_params: key word arguments for type of boundary condition under 
+            consideration. 
         """
         # Label surface
         new_phys_group = self.label_entity(2, ent_tags, new_name)
@@ -139,7 +139,7 @@ class DeviceGenerator:
         if bnd_type is not None:
             self.bnd_dict[new_name] = {
                 'type': bnd_type,
-                'params': bnd_params
+                **bnd_params
                 }
     
         return new_phys_group
@@ -537,7 +537,7 @@ class DeviceGenerator:
         gmsh.write(mesh_name)
 
 
-    def relabel_surface(self, old_label, new_label, *bnd_params, bnd_type=None):
+    def relabel_surface(self, old_label, new_label, bnd_type=None, **bnd_params):
         """Relabel surface using their old label. This function can also be 
             used to set the boundary condition on the surface being relabelled.
         
@@ -545,10 +545,10 @@ class DeviceGenerator:
         ---
         old_label (string or list of strings): Current labels of surfaces
         new_label (string): String we with to relabel with
-        *bnd_params: arguments for type of boundary condition under consideration.
-            See device.py for types boundary conditions available
-        bnd_type (string): Type of boundary condition to enforce. The 
-            possibilities are schottky, gate, or ohmic.
+        bnd_type (string): Type of boundary condition to enforce. The possibilities 
+            are e.g. schottky, gate, or ohmic.
+        **bnd_params: key word arguments for type of boundary condition under 
+            consideration. 
 
         Note:
         ---
@@ -583,7 +583,7 @@ class DeviceGenerator:
             if bnd_type is not None:
                 self.bnd_dict[new_label] = {
                     'type': bnd_type,
-                    'params': bnd_params
+                    **bnd_params
                 }
         
         # update attribute vol_entities

@@ -2,10 +2,6 @@ from device_generators.device_gen_hanson import DeviceGeneratorHanson
 import os
 
 # Constants
-## Mesh characteristic lengths
-char_len = 15 * 1e-3
-dot_char_len = char_len/2
-
 ## z dimensions
 ### Thickness of each material layer
 cap_thick = 30 * 1e-3
@@ -40,11 +36,12 @@ dG.new_layer(barrier_thick-dopant_thick, barrier_layers, label='barrier')
 dG.new_layer(two_deg_thick, two_deg_layers, label='two_deg')
 dG.new_layer(substrate_thick, substrate_layers, label='substrate')
 dG.new_layer(nsubstrate_thick, nsubstrate_layers, label='doped_substrate')
+# Cap layer
+dG.new_cap_layer('cap_surface', cap_thick, npts=cap_layers, 
+                vol_label="cap", bnd_label='cap_bnd')
 
-dG.new_cap_layer('cap_surface', cap_thick, npts = cap_layers, label="cap")
-
-# print('Setting up back gate...')
-# dG.label_bottom('back_gate')
+print('Setting up back gate...')
+dG.label_bottom('back_gate')
 
 # Display final layout
 dG.view()
