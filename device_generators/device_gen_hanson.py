@@ -57,30 +57,38 @@ class DeviceGeneratorHanson(DeviceGenerator):
                                             numElements=[npts]
                                             )
 
+        # Label cap volume
         cap_vol_tag = self._label_cap_volume(extr_surf, vol_label, 
                                             material, pdoping, ndoping) 
+        # Label cap boundary
         self._label_cap_bnd(extr_surf, cap_vol_tag, bnd_label,
                             bnd_type, **bnd_params)                                  
+        
         gmsh.model.occ.synchronize()  
 
-        # # Volume entity tag of cap layer
-        # cap_vol_tag = [e[1] for e in extr_surf if e[0]==3]
-        # # Create the physical volume
-        # cap_physical_volume = gmsh.model.addPhysicalGroup(3, cap_vol_tag)
-
-        # # Naming cap volume
-        # if vol_label is None: # generic name
-        #     vol_label=f'cap_volume'
-        # gmsh.model.setPhysicalName(3, cap_physical_volume, vol_label)
-
-        # # Store material properties
-        # self.material_dict[vol_label] = {
-        #     'material': material,
-        #     'pdoping':pdoping,
-        #     'ndoping':ndoping
-        #     }
-
     def _label_cap_volume(self, extr_surf, vol_label, mat, p, n):
+        """ Labels the cap volume.
+
+            Args:
+            ---
+            extr_surf (list of tuples): List of dimtags for the entities created
+                by the extrude to generate the cap.
+            vol_label (string): Label (physical name) for the layer. If None, 
+                generic name used: 'cap_volume'
+            mat (material object): Material the dot region is made of. To be 
+                used if the goal is to create a device. Defaults to silicon.
+                The material object may be a string, or an object used in an 
+                external finite element library to specify materials.
+            p (scalar): The density of acceptors in cm^-3.
+                    Default: 0.
+            n (scalar): The density of donors in cm^-3.
+                    Default: 0.
+
+            Returns
+            ---
+            cap_vol_tag (list of ints): List of the entity tags of the volumes
+                created by the extrude to form cap. 
+            """
 
         # Volume entity tag of cap layer
         cap_vol_tag = [e[1] for e in extr_surf if e[0]==3]
@@ -103,6 +111,21 @@ class DeviceGeneratorHanson(DeviceGenerator):
 
     def _label_cap_bnd(self, extr_surf, cap_vol_tag, bnd_label, 
         bnd_type=None, **bnd_params):
+        """ Labels the cap boundary.
+
+        Args:
+        ---
+        extr_surf (list of tuples): List of dimtags for the entities created
+            by the extrude to generate the cap.
+        cap_vol_tag (list of ints): List of the entity tags of the volumes
+            created by the extrude to form cap.
+        bnd_label (string): Label (physical name) for the surface on top of
+            the cap. If None, generic name used: 'cap_bnd'
+        bnd_type (string): Type of boundary condition to enforce at the top surface
+            of the cap. The possibilities are schottky, gate, or ohmic.
+        **bnd_params: key word arguments for type of boundary condition under 
+            consideration. 
+        """
 
         # Volume indeces
         vol_indeces = [extr_surf.index((3, v)) for v in cap_vol_tag]
