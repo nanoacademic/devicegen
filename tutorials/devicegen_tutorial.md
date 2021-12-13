@@ -15,7 +15,7 @@
 
 The aim of this tutorial is to demonstrate how the devicegen can be used to accelerate the generation of meshes appropriate for modelling semiconductor nanodevices. Here, the demonstration is made for the following gated quantum-dot system:
 
-![gated_dot](./figs/gated_dot_example/device_to_build.png)
+![gated_dot](./figs/gated_dot_example/device_to_build_gaas.png)
 
 The left-hand side of the above figure shows the layout for this example device, which can be found [here](../examples/layouts/gated_qd.gds). This layout file is in .gds format and can be visualized and modified using, e.g. [KLayout](https://www.klayout.de/). In the above picture, the red rectangle represents the simulation domain, while the blue rectangles represent metallic gates deposited on top of the chip that are used to control the confinement potential used to achieve confinement of single charge carriers in the *xOy* plane.
 
