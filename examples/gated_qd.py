@@ -72,4 +72,4 @@ dG.label_bottom('back_gate')
 dG.view()
 
 # Save mesh
-dG.save_mesh(mesh_name = script_dir + '/meshes/gated_dot.msh2')
+dG.save_mesh(mesh_name = script_dir + '/gated_dot.msh2')
