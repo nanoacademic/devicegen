@@ -44,6 +44,7 @@ class DeviceGenerator:
     ---
     view: Opens gmsh GUI to visualize device.
     save_mesh: Saves the generated mesh.
+    save_geo: Saves the geometry.
     new_dot_rectangle: Creates a rectangle where we expect an electron/hole 
         to be localized in the x and y directions.
     relabel_surface: Relabel surface using their old label. This function 
@@ -535,6 +536,17 @@ class DeviceGenerator:
         # Create the mesh
         gmsh.model.mesh.generate(dim=dim)
         gmsh.write(mesh_name)
+
+    def save_geo(self, geo_name='geometry.geo_unrolled'):
+        """ Saves the geometry.
+        
+        Args:
+        ---
+        geo_name (string): name of the geometry file. The extension should be
+            .geo_unrolled
+        """
+        # Create the geo file
+        gmsh.write(geo_name)
 
 
     def relabel_surface(self, old_label, new_label, *bnd_params, bnd_type=None):

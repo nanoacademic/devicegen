@@ -10,7 +10,7 @@ To install `devicegen`, we recommend first creating the `device_gen` environment
 
 ```bash
 $ conda env create -f environment.yml
-$ conda activate device_gen
+$ conda activate devicegen
 ```
 
 and then running:
