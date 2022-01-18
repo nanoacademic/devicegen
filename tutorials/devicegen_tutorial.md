@@ -19,7 +19,7 @@ The aim of this tutorial is to demonstrate how the devicegen can be used to acce
 
 The left-hand side of the above figure shows the layout for this example device, which can be found [here](../examples/layouts/gated_qd.gds). This layout file is in .gds format and can be visualized and modified using, e.g. [KLayout](https://www.klayout.de/). In the above picture, the red rectangle represents the simulation domain, while the blue rectangles represent metallic gates deposited on top of the chip that are used to control the confinement potential used to achieve confinement of single charge carriers in the *xOy* plane.
 
-The right-hand side of the above figure illustrates the heterostructure stack, i.e., the multiple layers of materials used to confine charge carriers in the *z* direction. Each layer will be labeled differently to represent the role it plays in the heterostructure, and will be assigned a certain number of mesh layers depending on how accurate the simulation should be in each region. In this example, the mismatch between conduction band edges of GaAs and AlGaAs is used to form a `barrier` isolating electrons in the substrate from the `cap` region, and an `n-doped layer` is used to bend the conduction band edge and form a triangular confinement potential in the region indicated as `2DEG` in the above figure.
+The right-hand side of the above figure illustrates the heterostructure stack, i.e., the multiple layers of materials used to confine charge carriers in the *z* direction. Each layer will be labeled differently to represent the role it plays in the heterostructure, and will be assigned a certain number of mesh layers depending on how accurate the simulation should be in each region. In this example, the mismatch between conduction band edges of GaAs and AlGaAs is used to form a `Barrier` isolating electrons in the substrate from the `Cap` region, and an `n-doped layer` is used to bend the conduction band edge and form a triangular confinement potential in the region indicated as `2DEG` in the above figure. Finally, a `Spacer` region is used to isolate the quantum dot formed in the `2DEG` from the dopants.
 
 ## Setup
 
@@ -44,18 +44,20 @@ Next we define some constants that will be useful in setting up the device in th
 char_len = 15 * 1e-3
 dot_char_len = char_len/2
 
-# # z dimensions
-# # # Thickness of each material layer
+## z dimensions
+### Thickness of each material layer
 cap_thick = 10 * 1e-3
 barrier_thick = 25 * 1e-3
 dopant_thick = 5 * 1e-3
+spacer_thick = 5 * 1e-3
 two_deg_thick = 5 * 1e-3
 substrate_thick = 100 * 1e-3 - two_deg_thick
 
-# # # Number of mesh points along growth axis
-cap_layers = 10
+### Number of mesh points along growth axis
+cap_layers = 5
 barrier_layers = 5
 dopant_layers = 10
+spacer_layers = 10
 two_deg_layers = 10
 substrate_layers = 10
 ```
@@ -160,9 +162,10 @@ Now that the 2D geometry has been addressed, we focus on creating the heterostru
 # Heterostructure stack
 print('Setting up heterostructure stack...')
 dG.new_layer(cap_thick, cap_layers, label='cap')
-dG.new_layer(barrier_thick-dopant_thick, barrier_layers, label='barrier')
-dG.new_layer(dopant_thick, dopant_layers, label='dopant_layer', 
-    dot_region=True, dot_label="dopant_dot")
+dG.new_layer(barrier_thick-dopant_thick-spacer_thick, barrier_layers, label='barrier')
+dG.new_layer(dopant_thick, dopant_layers, label='dopant_layer')
+dG.new_layer(spacer_thick, spacer_layers, label='spacer_layer', 
+    dot_region=True, dot_label="spacer_dot")
 dG.new_layer(two_deg_thick, two_deg_layers, label='two_deg',
     dot_region=True, dot_label="two_deg_dot")
 dG.new_layer(substrate_thick, substrate_layers, label='substrate', 
@@ -174,7 +177,9 @@ dG.view()
 
 This method has two inputs that indicate how thick each layer is and how fine the mesh is within this layer along the growth direction. This second input is given as an integer which tells the gmsh `extrude` function how many times to copy the layout along the growth direction to create the mesh (see [here](https://gitlab.onelab.info/gmsh/gmsh/-/blob/gmsh_4_8_4/tutorial/python/t2.py) for more details). The optional `label` input allows us to label the volume created by the layer. For some layers we have also specified `dot_region = True` and given a `dot_label`. These optional inputs allow us to separate the dot region in the layers from the rest of the layer and give the dot region a separate label. This could be useful, e.g. if we want to model the dot region differently from the rest of the device (e.g., treating the dot region quantum mechanically but the rest of the device classically). The `new_layer` method has multiple additional optional inputs that may be used to add metadata (such as the material and the doping) to each volume (see [device_gen.py](../device_generators/device_gen.py) for more details).
 
-Following the same steps as when we wanted to display the surface labels, we can also display volume labels. Using the `gmsh` GUI to move around and zoom, it should be clear that the dot volumes in the `dopant`, `two_deg`, and `substrate` layers have a separate name.
+Following the same steps as when we wanted to display the surface labels, we can also display volume labels. Using the `gmsh` GUI to move around and zoom, it should be clear that the dot volumes in the `spacer`, `two_deg`, and `substrate` layers have a separate name.
+
+**Tip:** It may be easier to read the physical group label using the dark interface of the Gmsh GUI. To activate or deactivate the dark interface: Gmsh GUI &#8594; Tools &#8594; Options &#8594; General &#8594; General &#8594; Use dark interface.
 
 ![labelled_volumes](./figs/gated_dot_example/labelled_volumes.png)
 
@@ -211,22 +216,24 @@ from device_generators.device_gen import DeviceGenerator
 import os
 
 # Constants
-# # characteristic lengths
+## Mesh characteristic lengths
 char_len = 15 * 1e-3
 dot_char_len = char_len/2
 
-# # z dimensions
-# # # Thickness of each material layer
+## z dimensions
+### Thickness of each material layer
 cap_thick = 10 * 1e-3
 barrier_thick = 25 * 1e-3
 dopant_thick = 5 * 1e-3
+spacer_thick = 5 * 1e-3
 two_deg_thick = 5 * 1e-3
 substrate_thick = 100 * 1e-3 - two_deg_thick
 
-# # # Number of mesh points along growth axis
-cap_layers = 10
+### Number of mesh points along growth axis
+cap_layers = 5
 barrier_layers = 5
 dopant_layers = 10
+spacer_layers = 10
 two_deg_layers = 10
 substrate_layers = 10
 
@@ -263,9 +270,10 @@ dG.view()
 # Heterostructure stack
 print('Setting up heterostructure stack...')
 dG.new_layer(cap_thick, cap_layers, label='cap')
-dG.new_layer(barrier_thick-dopant_thick, barrier_layers, label='barrier')
-dG.new_layer(dopant_thick, dopant_layers, label='dopant_layer', 
-    dot_region=True, dot_label="dopant_dot")
+dG.new_layer(barrier_thick-dopant_thick-spacer_thick, barrier_layers, label='barrier')
+dG.new_layer(dopant_thick, dopant_layers, label='dopant_layer')
+dG.new_layer(spacer_thick, spacer_layers, label='spacer_layer', 
+    dot_region=True, dot_label="spacer_dot")
 dG.new_layer(two_deg_thick, two_deg_layers, label='two_deg',
     dot_region=True, dot_label="two_deg_dot")
 dG.new_layer(substrate_thick, substrate_layers, label='substrate', 
