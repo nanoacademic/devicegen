@@ -11,13 +11,15 @@ dot_char_len = char_len/2
 cap_thick = 10 * 1e-3
 barrier_thick = 25 * 1e-3
 dopant_thick = 5 * 1e-3
+spacer_thick = 5 * 1e-3
 two_deg_thick = 5 * 1e-3
 substrate_thick = 100 * 1e-3 - two_deg_thick
 
 ### Number of mesh points along growth axis
-cap_layers = 10
+cap_layers = 5
 barrier_layers = 5
 dopant_layers = 10
+spacer_layers = 10
 two_deg_layers = 10
 substrate_layers = 10
 
@@ -54,9 +56,10 @@ dG.view()
 # Heterostructure stack
 print('Setting up heterostructure stack...')
 dG.new_layer(cap_thick, cap_layers, label='cap')
-dG.new_layer(barrier_thick-dopant_thick, barrier_layers, label='barrier')
-dG.new_layer(dopant_thick, dopant_layers, label='dopant_layer', 
-    dot_region=True, dot_label="dopant_dot")
+dG.new_layer(barrier_thick-dopant_thick-spacer_thick, barrier_layers, label='barrier')
+dG.new_layer(dopant_thick, dopant_layers, label='dopant_layer')
+dG.new_layer(spacer_thick, spacer_layers, label='spacer_layer', 
+    dot_region=True, dot_label="spacer_dot")
 dG.new_layer(two_deg_thick, two_deg_layers, label='two_deg',
     dot_region=True, dot_label="two_deg_dot")
 dG.new_layer(substrate_thick, substrate_layers, label='substrate', 
