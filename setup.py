@@ -7,6 +7,7 @@ setup(
     license='GPLv3+',
     author="Pericles Philippopoulos, Felix Beaudoin",
     author_email="pericles@nanoacademic.com",
+    url="https://github.com/nanoacademic/devicegen",
     description="Device generator for gated quantum devices",
     classifiers=[
         "Programming Language :: Python :: 3",
