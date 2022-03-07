@@ -61,8 +61,63 @@ class DeviceGenerator:
         for each entity
     get_volumes: Get the volumes under a surface with a given name
     get_surfaces: Get the surfaces under a surface with a given name
+    new_top_layer: Generate a top layer and gate.
     """
+    
+    def new_top_layer(self, thickness, *bnd_params, npts=10, 
+        surfs_to_extrude=None, label=None, material=None, pdoping=0, 
+        ndoping=0, bnd_label=None, bnd_type=None):
+        """ Generate a top layer and gate.
+        
+        Args:
+        ---
+        thickness (scalar): Thickness of the new layer.
+        *bnd_params: arguments for type of boundary condition under consideration.
+            (See device.py for types boundary conditions available in QTCAD)
+        npts (int): number of points along the extruded dimension. 
+        surfs_to_extrude (list of strings): Names of surfaces over which we want 
+            to define a top gate. Defaults to None, in which case the surfaces stored
+            in the attribute 'top_surface' are used.
+        material (material object): Material the dot region is made of.
+            The material object may be a string, or an object used in an 
+            external finite element library to specify materials (e.g. QTCAD).
+        pdoping (scalar): The density of acceptors in cm^-3.
+                Default: 0.
+        ndoping (scalar): The density of donors in cm^-3.
+                Default: 0.
+        bnd_label (string): Label for the top of the extruded surface. 
+        bnd_type (string): Type of boundary condition to enforce. The possibilities are
+            for e.g. QTCAD are schottky, gate, or ohmic.
+        """
+        
+        # Establish which surfaces need to be extruded 
+        # (those that have no associated boundary conditions)
+        if surfs_to_extrude is None:
+            surfs_to_extrude = self.top_surface
+        else:
+            surfs_to_extrude = self.get_ent_tag_from_name(surfs_to_extrude)
 
+        # Perform the extrude operation
+        extr_surf = gmsh.model.occ.extrude(surfs_to_extrude, 0, 0, thickness, numElements=[npts])
+        gmsh.model.occ.synchronize()  
+        
+        # Add a physical name to the generated volume.
+        # Get the generated volumes
+        V = [e[1] for e in extr_surf if e[0]==3] # Volumes generated from extrusion
+        
+        if label is None: # generic name
+            label=f'volume{self.layer_counter}'
+            self.layer_counter += 1
+        
+        self.label_volume(V, label, material, pdoping, ndoping)
+        
+        # Add a physical name for top gate.
+        surfs = [e[1] for e in self.track_surface(extr_surf)]
+        self.label_surface(surfs, bnd_label, bnd_type, *bnd_params)
+        
+        gmsh.model.occ.synchronize()
+
+    
     def label_bottom(self, label, *bnd_params, bnd_type=None):
         """ Label the bottom surface of the device
 
@@ -70,9 +125,9 @@ class DeviceGenerator:
         ---
         label (string): Label for the bottom surface. 
         *bnd_params: arguments for type of boundary condition under consideration.
-            See device.py for types boundary conditions available
+            (See device.py for types boundary conditions available in QTCAD)
         bnd_type (string): Type of boundary condition to enforce. The possibilities are
-            schottky, gate, or ohmic.
+            for e.g. QTCAD are schottky, gate, or ohmic.
         """
         # Check that we are not trying to label the top surface
         if self.first_layer:
@@ -86,11 +141,7 @@ class DeviceGenerator:
         gmsh.model.occ.synchronize()
 
         # Storing boundary condition
-        if bnd_type is not None:
-            self.bnd_dict[label] = {
-                'type': bnd_type,
-                'params': bnd_params
-            }
+        self.store_bnd_conditions(label, bnd_type, *bnd_params)
 
     def label_volume(self, ent_tags, new_name, material=None, 
         pdoping=0, ndoping=0):
@@ -112,16 +163,12 @@ class DeviceGenerator:
         new_phys_group = self.label_entity(3, ent_tags, new_name)
 
         # Store material properties
-        self.material_dict[new_name] = {
-            'material': material,
-            'pdoping':pdoping,
-            'ndoping':ndoping
-            }
+        self.store_mat_properties(new_name, material, pdoping, ndoping)
     
         return new_phys_group
 
 
-    def label_surface(self, ent_tags, new_name, *bnd_params, bnd_type=None):
+    def label_surface(self, ent_tags, new_name, bnd_type, *bnd_params):
         """ Gives a physical name to a surface entity.
         
         Args:
@@ -129,19 +176,15 @@ class DeviceGenerator:
         ent_tags (list): Entities to name.
         new_name (string): Phsysical name
         *bnd_params: arguments for type of boundary condition under consideration.
-            See device.py for types boundary conditions available
-        bnd_type (string): Type of boundary condition to enforce. The 
-            possibilities are schottky, gate, or ohmic.
+            (See device.py for types boundary conditions available in QTCAD)
+        bnd_type (string): Type of boundary condition to enforce. The possibilities are
+            for e.g. QTCAD are schottky, gate, or ohmic.
         """
         # Label surface
         new_phys_group = self.label_entity(2, ent_tags, new_name)
 
         # Storing boundary conditions
-        if bnd_type is not None:
-            self.bnd_dict[new_name] = {
-                'type': bnd_type,
-                'params': bnd_params
-                }
+        self.store_bnd_conditions(new_name, bnd_type, *bnd_params)
     
         return new_phys_group
 
@@ -249,10 +292,9 @@ class DeviceGenerator:
             the dot region under the 'dot_rectangles'
         dot_label (string): Physical name for the dot region in the given 
             layer. If None, a generic name is used.
-        material (material object): Material the dot region is made of. To be 
-            used if the goal is to create a device. Defaults to silicon.
+        material (material object): Material the dot region is made of.
             The material object may be a string, or an object used in an 
-            external finite element library to specify materials.
+            external finite element library to specify materials (e.g. QTCAD).
         pdoping (scalar): The density of acceptors in cm^-3.
                 Default: 0.
         ndoping (scalar): The density of donors in cm^-3.
@@ -293,12 +335,8 @@ class DeviceGenerator:
         self.layer_counter += 1
 
         # Store material properties
-        self.material_dict[label] = {
-            'material': material,
-            'pdoping':pdoping,
-            'ndoping':ndoping
-            }
-    
+        self.store_mat_properties(label, material, pdoping, ndoping)
+
         gmsh.model.occ.synchronize()  
 
     
@@ -414,8 +452,9 @@ class DeviceGenerator:
             are appended.
         label (string): Physical name for the dot region in the given layer. If
             None, a generic name is used. 
-        material (material object): Material the dot region is made of. To be used if 
-            the goal is to create a device. Defaults to silicon.
+        material (material object): Material the dot region is made of.
+            The material object may be a string, or an object used in an 
+            external finite element library to specify materials (e.g. QTCAD).
         pdoping (scalar): The density of acceptors in cm^-3.
                 Default: 0.
         ndoping (scalar): The density of donors in cm^-3.
@@ -459,11 +498,7 @@ class DeviceGenerator:
                 gmsh.model.setPhysicalName(3, phys_volume, dot_label)
                 
                 # Store material properties
-                self.material_dict[dot_label] = {
-                    'material': material,
-                    'pdoping':pdoping,
-                    'ndoping':ndoping
-                    }
+                self.store_mat_properties(dot_label, material, pdoping, ndoping)
                        
     def get_tag_from_name(self, name, dim=2):
         """ Get the physical tags associated with a physical name.
@@ -558,9 +593,9 @@ class DeviceGenerator:
         old_label (string or list of strings): Current labels of surfaces
         new_label (string): String we with to relabel with
         *bnd_params: arguments for type of boundary condition under consideration.
-            See device.py for types boundary conditions available
-        bnd_type (string): Type of boundary condition to enforce. The 
-            possibilities are schottky, gate, or ohmic.
+            (See device.py for types boundary conditions available in QTCAD)
+        bnd_type (string): Type of boundary condition to enforce. The possibilities are
+            for e.g. QTCAD are schottky, gate, or ohmic.
 
         Note:
         ---
@@ -592,11 +627,11 @@ class DeviceGenerator:
             gmsh.model.occ.synchronize()
 
             # Storing boundary conditions
-            if bnd_type is not None:
-                self.bnd_dict[new_label] = {
-                    'type': bnd_type,
-                    'params': bnd_params
-                }
+            self.store_bnd_conditions(new_label, bnd_type, *bnd_params)
+
+            # Update top_surface attribute
+            for tag in ent_tags:
+                self.top_surface.remove((2, tag))
         
         # update attribute vol_entities
         self._update_vol_entity_keys(ent_tags, old_label, new_label)
@@ -717,7 +752,44 @@ class DeviceGenerator:
         self.dot_counter += 1
 
         return surf
+    
+    def store_mat_properties(self, label, material, pdoping, ndoping):
+        """ Store material properties in device attribute 'material_dict'
+        
+        Args:
+        ---
+        label (string): Label (physical name) for the volume considered.
+       material (material object): Material the dot region is made of.
+            The material object may be a string, or an object used in an 
+            external finite element library to specify materials (e.g. QTCAD).
+        pdoping (scalar): The density of acceptors in cm^-3.
+                Default: 0.
+        ndoping (scalar): The density of donors in cm^-3.
+                    Default: 0.
+        """
+        self.material_dict[label] = {
+            'material': material,
+            'pdoping':pdoping,
+            'ndoping':ndoping
+            }
 
+    def store_bnd_conditions(self, label, bnd_type, *bnd_params):
+        """ Store boundary condition information in the device attribute 'bnd_dict'
+
+        Args:
+        ---
+        label (string): Label for the boundary under consideration
+        *bnd_params: arguments for type of boundary condition under consideration.
+            (See device.py for types boundary conditions available in QTCAD)
+        bnd_type (string): Type of boundary condition to enforce. The possibilities are
+            for e.g. QTCAD are schottky, gate, or ohmic.
+        """
+        if bnd_type is not None:
+            self.bnd_dict[label] = {
+                'type': bnd_type,
+                'params': bnd_params
+            }
+    
 
     def get_names(self, dim):
         """ Get names of all the physical groups of a given dimension.
