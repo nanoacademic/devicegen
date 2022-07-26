@@ -62,6 +62,7 @@ class DeviceGenerator:
     get_volumes: Get the volumes under a surface with a given name
     get_surfaces: Get the surfaces under a surface with a given name
     new_top_layer: Generate a top layer and gate.
+    set_h: Set the characteristic length throughout the mesh
     """
     
     def new_top_layer(self, thickness, *bnd_params, npts=10, 
@@ -558,6 +559,15 @@ class DeviceGenerator:
 
         return ent_tag
 
+    def set_h(self, h):
+        """ Set the characteristic length throughout the mesh.
+        
+        Args:
+            h (float): Characterisitc length
+        """
+
+        gmsh.option.setNumber("Mesh.CharacteristicLengthMax", h)
+        gmsh.option.setNumber("Mesh.CharacteristicLengthMin", h)
 
     def save_mesh(self, dim=3, mesh_name='mesh.msh2'):
         """ Saves the generated mesh.
