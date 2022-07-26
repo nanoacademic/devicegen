@@ -66,7 +66,7 @@ class DeviceGenerator:
     
     def new_top_layer(self, thickness, *bnd_params, npts=10, 
         surfs_to_extrude=None, label=None, material=None, pdoping=0, 
-        ndoping=0, bnd_label=None, bnd_type=None):
+        ndoping=0, bnd_label="top", bnd_type=None):
         """ Generate a top layer and gate.
         
         Args:
