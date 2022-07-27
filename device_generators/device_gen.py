@@ -96,6 +96,7 @@ class DeviceGenerator:
             surfs_to_extrude = self.top_surface
         else:
             surfs_to_extrude = self.get_ent_tag_from_name(surfs_to_extrude)
+            surfs_to_extrude = [(2, ent) for ent in surfs_to_extrude]
 
         # Perform the extrude operation
         extr_surf = gmsh.model.occ.extrude(surfs_to_extrude, 0, 0, thickness, numElements=[npts])
