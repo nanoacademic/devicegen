@@ -29,10 +29,10 @@ To generate the mesh for the gated quantum dot using the device generator, we st
 
 ``` python
 from device_generators.device_gen import DeviceGenerator
-import os
+import pathlib
 ```
 
-The first import is the `DeviceGenerator`, while the second is the standard python library `os` which will be used to facilitate referencing separate files.
+The first import is the `DeviceGenerator`, while the second is the standard python library `pathlib` which will be used to facilitate referencing separate files.
 
 ### Constants
 
@@ -52,6 +52,7 @@ dopant_thick = 5 * 1e-3
 spacer_thick = 5 * 1e-3
 two_deg_thick = 5 * 1e-3
 substrate_thick = 100 * 1e-3 - two_deg_thick
+top_layer_thick = 10e-3
 
 ### Number of mesh points along growth axis
 cap_layers = 5
@@ -60,6 +61,7 @@ dopant_layers = 10
 spacer_layers = 10
 two_deg_layers = 10
 substrate_layers = 10
+top_layers = 10
 ```
 
 ### Load layout
@@ -68,15 +70,17 @@ The final step of the setup is to load the layout of the device in the `DeviceGe
 
 ``` python
 # Initializing the DeviceGenerator
-script_dir = os.path.dirname(__file__)
-file = script_dir + '/layouts/gated_qd.txt'
-dG = DeviceGenerator(file, outfile='layouts/gated_qd.geo', h=char_len)
+path = pathlib.Path(__file__).parent.resolve()
+file = str(path/'layouts/gated_qd.txt')
+outfile=str(path/'layouts/gated_qd.geo')
+dG = DeviceGenerator(file, outfile=outfile, h=char_len)
+
 ```
 
-The constructor `DeviceGenerator` has one required argument and multiple optional arguments. The only required argument is the path to the file containing the layout. In our case, it is the .gds file store in `file`.
-If a .gds file is loaded, the `DeviceGenerator` automatically creates a corresponding .geo file, named `parsed.geo` by default, containing the same information. The path and the the name of the output .geo file can be specified in the optional input `outfile`. The optional input `h` controls the characteristic length of the mesh generated over the layout. The characteristic lengths at different points can further be altered later on using e.g. the `new_box_field` method of the `DeviceGenerator` (see [device_gen.py](../device_generators/device_gen.py)).  
+The constructor `DeviceGenerator` has one required argument and multiple optional arguments. The only required argument is the path to the file containing the layout. In our case, it is the .gds file store in `file` (in .txt format).
+If a .gds file is loaded, the `DeviceGenerator` automatically creates a corresponding .geo file, named `parsed.geo` by default, containing the same information. The path and the name of the output .geo file can be specified in the optional input `outfile`. The optional input `h` controls the characteristic length of the mesh generated over the layout. The characteristic lengths at different points can further be altered later on using e.g. the `new_box_field` method of the `DeviceGenerator` (see [device_gen.py](../device_generators/device_gen.py)).  
 
-The layout can be viewed within the `gmsh` GUI by running 
+The layout can be viewed within the `gmsh` GUI by running
 
 ```python
 # visualization
@@ -97,7 +101,7 @@ dG.new_dot_rectangle(dot_xmin, dot_ymin, dot_len_x, dot_len_y,
     h=dot_char_len)
 ```
 
-This method has four arguments and an optional argument. The arguments are the minimal x and y values of the 'dot rectangle' and its length in the x and y directions. In this example, these are given by the constants: `dot_xmin`,  `dot_ymin`, `dot_len_x`, and `dot_len_y`, respectively. Recall that the units of length used by the device generator are microns. Finally there is also the optional input `h` which sets the characteristic length of the mesh within the dot rectangle.
+This method has four arguments and an optional argument. The arguments are the minimal x and y values of the 'dot rectangle' and its length in the x and y directions. In this example, these are given by the constants: `dot_xmin`, `dot_ymin`, `dot_len_x`, and `dot_len_y`, respectively. Recall that the units of length used by the device generator are microns. Finally, there is also the optional input `h` which sets the characteristic length of the mesh within the dot rectangle.
 
 Again, we can visualize the model thus far with the `view` method.
 
@@ -132,7 +136,7 @@ The mesh within the dot region should be twice as fine as outside the dot region
 
 ## Relabelling surfaces
 
-The `relabel_surface` method allows us to relabel the surfaces which have been automatically assigned generic names. Here we distiguish three top gates from three bottom gates.
+The `relabel_surface` method allows us to relabel the surfaces which have been automatically assigned generic names. Here we distinguish three top gates from three bottom gates.
 
 ```python
 # Relabelling surfaces
@@ -148,7 +152,7 @@ dG.relabel_surface('surf5', 'bottom_gate_3')
 dG.view()
 ```
 
-The first input of the `relabel_surface` method is the old name of the surface and the second input is its new name. This method has additional optional inputs that allows users to set some meta data for each surface which can define the boundary conditions at the surface (see [device_gen.py](../device_generators/device_gen.py).
+The first input of the `relabel_surface` method is the old name of the surface and the second input is its new name. This method has additional optional inputs that allows users to set some metadata for each surface which can define the boundary conditions at the surface (see [device_gen.py](../device_generators/device_gen.py).
 
 Using the same procedure described above, the surface labels can be shown to be:
 
@@ -197,13 +201,29 @@ dG.view()
 
 This method will label the bottom surface with the string given to it as input.
 
+## Defining a top layer and global top gate
+
+There is also a method, `new_top_layer`, which can be used to generate a top layer for the device.
+This top layer will be generated on top of the layout layer.
+
+```python
+dG.new_top_layer(
+    top_layer_thick, npts=top_layers, bnd_label='top_gate', label='top'
+    )
+
+# Display final layout
+dG.view()
+```
+
+This method has one required input, the thickness of the top layer, and multiple optional inputs. Here, we have used `npts`, which determines the number of nodes the mesh will have along the top layer, `bnd_label`, which labels the surface on top of the top layer, and `label` which labels the volume of the top layer. By default, the top layer is created on top of all surfaces not relabeled (with the `relabel_surface` method). These surfaces can be accessed via the `top_surface` attribute of `dG`. The surfaces over which the top layer will be generated can be manually modified using the `surfs_to_extrude` keyword argument of the `new_top_layer` method.
+
 ## Saving the mesh
 
 Finally, we can save the mesh generated from the instructions above to the disk using the `save_mesh` method
 
 ```python
 # Save mesh
-dG.save_mesh(mesh_name = script_dir + '/meshes/gated_dot.msh2')
+dG.save_mesh(mesh_name = str(path/'meshes/gated_dot.msh2'))
 ```
 
 Here the `mesh_name` input gives the path and name of the output mesh.
@@ -213,7 +233,7 @@ By default, the output mesh will be saved in a file named `mesh.msh2`. However h
 
 ```python
 from device_generators.device_gen import DeviceGenerator
-import os
+import pathlib
 
 # Constants
 ## Mesh characteristic lengths
@@ -228,6 +248,7 @@ dopant_thick = 5 * 1e-3
 spacer_thick = 5 * 1e-3
 two_deg_thick = 5 * 1e-3
 substrate_thick = 100 * 1e-3 - two_deg_thick
+top_layer_thick = 10e-3
 
 ### Number of mesh points along growth axis
 cap_layers = 5
@@ -236,11 +257,12 @@ dopant_layers = 10
 spacer_layers = 10
 two_deg_layers = 10
 substrate_layers = 10
+top_layers = 10
 
 # Initializing the DeviceGenerator
-script_dir = os.path.dirname(__file__)
-file = script_dir + '/layouts/gated_qd.txt'
-outfile=script_dir + '/layouts/gated_qd.geo'
+path = pathlib.Path(__file__).parent.resolve()
+file = str(path/'layouts/gated_qd.txt')
+outfile=str(path/'layouts/gated_qd.geo')
 dG = DeviceGenerator(file, outfile=outfile, h=char_len)
 
 # Display layout
@@ -281,13 +303,20 @@ dG.new_layer(substrate_thick, substrate_layers, label='substrate',
 
 # Display heterostructure stack
 dG.view()
-
 print('Setting up back gate...')
+
+# Back gate
 dG.label_bottom('back_gate')
+dG.view()
+
+# Top gate
+dG.new_top_layer(
+    top_layer_thick, npts=top_layers, bnd_label='top_gate', label='top'
+    )
 
 # Display final layout
 dG.view()
 
 # Save mesh
-dG.save_mesh(mesh_name = script_dir + '/meshes/gated_dot.msh2')
+dG.save_mesh(mesh_name = str(path/'meshes/gated_dot.msh2'))
 ```
