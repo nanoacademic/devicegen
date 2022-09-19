@@ -941,7 +941,7 @@ class DeviceGenerator:
             P.parse()
             geo_file = outfile
         # .geo files
-        elif file_path[-4:] == '.geo':
+        elif file_path.split(".")[-1] in ["geo","geo_unrolled"]:
             geo_file = file_path
         
         # Length scales
