@@ -906,16 +906,21 @@ class DeviceGenerator:
         """
         gmsh.fltk.run()
 
-    def __init__(self, file_path, outfile='parsed.geo', h=10, to_terminal=False):
+    def __init__(self, file_path, outfile='parsed.geo', h=10, to_terminal=False,
+        scale=1e-6):
         """ Constructor for the DeviceGenerator class.
         Args:
         ---
         file_path (string): Path to .gds file where 2D gate pattern is saved.
         outfile (string): Path to .geo file that is created from .gds file and that
             will be loaded into gmsh.
-        h (scalar): Characteristic length at nodes that are not added by the solver.
-            Default value is 10 microns.
-        to_terminal (boolean): whether or not to print gmsh outputs to terminal
+        h (scalar, optional): Characteristic length at nodes that are not added by 
+            the solver. Default value is 10 microns.
+        to_terminal (boolean, optional): whether or not to print gmsh outputs to 
+            terminal
+        scale (float, optional): Scaling factor to convert to SI units. 
+            Default: 1e-6, meaning that distances are expressed in microns.
+
         """
         # Since no layers have been created, we are at the first layer
         self.first_layer = True
@@ -945,7 +950,7 @@ class DeviceGenerator:
             geo_file = file_path
         
         # Length scales
-        self.scale = 1e-6
+        self.scale = scale
         self.h = h
         
         # Dictionary used to store material properties and boundary conditions 
