@@ -33,8 +33,6 @@ class DeviceGenerator:
     dot_counter (int): counter for dots created. Used for generating names of
         physical groups for dots.
     field_counter (int): counter for mesh fields created.
-    scale (scalar): Factor by which node coordinates are multiplied for 
-        conversion to SI units.
     material_dict (dictionary): Contains the material properties of each 
         physical volume of the generated mesh/device 
     bnd_dict (dictionary): Contains the boundary conditions that are to be 

@@ -85,7 +85,6 @@ class Parser:
         outfile.write(curve_loop_str)
 
         # Store index for curve loops of different layers
-        # (will be used to perform Boolean fragments when creating surfaces)
         self.layers[layer].append(self.cl_counter)
 
         # Creating surfaces. 
@@ -95,23 +94,6 @@ class Parser:
         self.surf_counter += 1
 
         outfile.write('\n')
-
-    def _create_surfaces(self, outfile):
-        """ Create surfaces from Boolean fragments
-        Args:
-        ---
-        outfile (file): .geo file being created
-        """
-        # Order the curve loops in the different layers
-        l = list(self.layers.keys())
-        l.sort()
-
-        # Create Boolean fragment removing elements from layer above from layer below
-        for i in range(len(l) - 1):
-            surfaces = ', '.join(list(map(str, self.layers[l[i]])) 
-                + list(map(str, self.layers[l[i+1]])))
-            BF_string = f"BooleanFragments{{ Surface{{{surfaces}}}; Delete; }}{{}}"
-            outfile.write(BF_string)
 
     def _parse_points(self, f, o):
         """ Converts a .gds file to a .geo file.
