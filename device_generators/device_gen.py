@@ -33,8 +33,6 @@ class DeviceGenerator:
     dot_counter (int): counter for dots created. Used for generating names of
         physical groups for dots.
     field_counter (int): counter for mesh fields created.
-    scale (scalar): Factor by which node coordinates are multiplied for 
-        conversion to SI units.
     material_dict (dictionary): Contains the material properties of each 
         physical volume of the generated mesh/device 
     bnd_dict (dictionary): Contains the boundary conditions that are to be 
@@ -918,8 +916,6 @@ class DeviceGenerator:
             the solver. Default value is 10 microns.
         to_terminal (boolean, optional): whether or not to print gmsh outputs to 
             terminal
-        scale (float, optional): Scaling factor to convert to SI units. 
-            Default: 1e-6, meaning that distances are expressed in microns.
 
         """
         # Since no layers have been created, we are at the first layer
@@ -948,10 +944,6 @@ class DeviceGenerator:
         # .geo files
         elif file_path.split(".")[-1] in ["geo","geo_unrolled"]:
             geo_file = file_path
-        
-        # Length scales
-        self.scale = scale
-        self.h = h
         
         # Dictionary used to store material properties and boundary conditions 
         # of a generated device
