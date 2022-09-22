@@ -910,7 +910,8 @@ class DeviceGenerator:
         """ Constructor for the DeviceGenerator class.
         Args:
         ---
-        file_path (string): Path to .gds file where 2D gate pattern is saved.
+        file_path (string): Path to .gds, .geo, or .geo_unrolled file where the
+            2D gate pattern is saved.
         outfile (string): Path to .geo file that is created from .gds file and
             that will be loaded into gmsh.
         h (scalar, optional): Maximal in-plane characteristic length of the
