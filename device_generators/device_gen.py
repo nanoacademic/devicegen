@@ -33,8 +33,6 @@ class DeviceGenerator:
     dot_counter (int): counter for dots created. Used for generating names of
         physical groups for dots.
     field_counter (int): counter for mesh fields created.
-    scale (scalar): Factor by which node coordinates are multiplied for 
-        conversion to SI units.
     material_dict (dictionary): Contains the material properties of each 
         physical volume of the generated mesh/device 
     bnd_dict (dictionary): Contains the boundary conditions that are to be 
@@ -906,16 +904,22 @@ class DeviceGenerator:
         """
         gmsh.fltk.run()
 
-    def __init__(self, file_path, outfile='parsed.geo', h=10, to_terminal=False):
+    def __init__(
+        self, file_path, outfile='parsed.geo', h=10, to_terminal=False
+        ):
         """ Constructor for the DeviceGenerator class.
         Args:
         ---
-        file_path (string): Path to .gds file where 2D gate pattern is saved.
-        outfile (string): Path to .geo file that is created from .gds file and that
-            will be loaded into gmsh.
-        h (scalar): Characteristic length at nodes that are not added by the solver.
-            Default value is 10 microns.
-        to_terminal (boolean): whether or not to print gmsh outputs to terminal
+        file_path (string): Path to .gds, .geo, or .geo_unrolled file where the
+            2D gate pattern is saved.
+        outfile (string): Path to .geo file that is created from .gds file and
+            that will be loaded into gmsh.
+        h (scalar, optional): Maximal in-plane characteristic length of the
+            mesh. Here, the "plane" is that of the layout. Default value is 10
+            (the units are the same as the layout file).
+        to_terminal (boolean, optional): whether or not to print gmsh outputs
+            to terminal.
+
         """
         # Since no layers have been created, we are at the first layer
         self.first_layer = True
@@ -941,12 +945,8 @@ class DeviceGenerator:
             P.parse()
             geo_file = outfile
         # .geo files
-        elif file_path[-4:] == '.geo':
+        elif file_path.split(".")[-1] in ["geo", "geo_unrolled"]:
             geo_file = file_path
-        
-        # Length scales
-        self.scale = 1e-6
-        self.h = h
         
         # Dictionary used to store material properties and boundary conditions 
         # of a generated device
