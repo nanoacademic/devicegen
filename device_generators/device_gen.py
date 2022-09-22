@@ -904,18 +904,20 @@ class DeviceGenerator:
         """
         gmsh.fltk.run()
 
-    def __init__(self, file_path, outfile='parsed.geo', h=10, to_terminal=False,
-        scale=1e-6):
+    def __init__(
+        self, file_path, outfile='parsed.geo', h=10, to_terminal=False
+        ):
         """ Constructor for the DeviceGenerator class.
         Args:
         ---
         file_path (string): Path to .gds file where 2D gate pattern is saved.
-        outfile (string): Path to .geo file that is created from .gds file and that
-            will be loaded into gmsh.
-        h (scalar, optional): Characteristic length at nodes that are not added by 
-            the solver. Default value is 10 microns.
-        to_terminal (boolean, optional): whether or not to print gmsh outputs to 
-            terminal
+        outfile (string): Path to .geo file that is created from .gds file and
+            that will be loaded into gmsh.
+        h (scalar, optional): Maximal in-plane characteristic length of the
+            mesh. Here, the "plane" is that of the layout. Default value is 10
+            (the units are the same as the layout file).
+        to_terminal (boolean, optional): whether or not to print gmsh outputs
+            to terminal.
 
         """
         # Since no layers have been created, we are at the first layer
@@ -942,7 +944,7 @@ class DeviceGenerator:
             P.parse()
             geo_file = outfile
         # .geo files
-        elif file_path.split(".")[-1] in ["geo","geo_unrolled"]:
+        elif file_path.split(".")[-1] in ["geo", "geo_unrolled"]:
             geo_file = file_path
         
         # Dictionary used to store material properties and boundary conditions 
