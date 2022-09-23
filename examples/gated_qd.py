@@ -1,5 +1,5 @@
 from device_generators.device_gen import DeviceGenerator
-import os
+import pathlib
 
 # Constants
 ## Mesh characteristic lengths
@@ -14,6 +14,7 @@ dopant_thick = 5 * 1e-3
 spacer_thick = 5 * 1e-3
 two_deg_thick = 5 * 1e-3
 substrate_thick = 100 * 1e-3 - two_deg_thick
+top_layer_thick = 10e-3
 
 ### Number of mesh points along growth axis
 cap_layers = 5
@@ -22,11 +23,12 @@ dopant_layers = 10
 spacer_layers = 10
 two_deg_layers = 10
 substrate_layers = 10
+top_layers = 10
 
 # Initializing the DeviceGenerator
-script_dir = os.path.dirname(__file__)
-file = script_dir + '/layouts/gated_qd.txt'
-outfile=script_dir + '/layouts/gated_qd.geo'
+path = pathlib.Path(__file__).parent.resolve()
+file = str(path/'layouts/gated_qd.txt')
+outfile=str(path/'layouts/gated_qd.geo')
 dG = DeviceGenerator(file, outfile=outfile, h=char_len)
 
 # Display layout
@@ -67,12 +69,19 @@ dG.new_layer(substrate_thick, substrate_layers, label='substrate',
 
 # Display heterostructure stack
 dG.view()
-
 print('Setting up back gate...')
+
+# Back gate
 dG.label_bottom('back_gate')
+dG.view()
+
+# Top gate
+dG.new_top_layer(
+    top_layer_thick, npts=top_layers, bnd_label='top_gate', label='top'
+    )
 
 # Display final layout
 dG.view()
 
 # Save mesh
-dG.save_mesh(mesh_name = script_dir + '/meshes/gated_dot.msh2')
+dG.save_mesh(mesh_name = str(path/'meshes/gated_dot.msh2'))
