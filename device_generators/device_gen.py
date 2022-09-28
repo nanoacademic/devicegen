@@ -277,6 +277,33 @@ class DeviceGenerator:
         # Synchronize
         gmsh.model.occ.synchronize()
 
+    def new_constant_field(self, surfs_list, VIn, VOut=None):
+        """ Create a box field
+
+        Args:
+        ---
+        surfs_list (list): Integers labeling all the surface entities in which
+            to modify the mesh size
+        VIn (scalar): characteristic length of field inside surfaces.
+        VOut (scalar): characteristic length of field outside surfaces.
+        """
+        # Clear any meshes already present
+        gmsh.model.mesh.clear(dimTags=[])
+
+        # Create constant field
+        gmsh.model.mesh.field.add("Constant", self.field_counter)
+        gmsh.model.mesh.field.setNumber(self.field_counter, "VIn", VIn)
+        gmsh.model.mesh.field.setNumbers(self.field_counter, "SurfacesList", 
+            surfs_list)
+        if VOut is not None:
+            gmsh.model.mesh.field.setNumber(self.field_counter, "VOut", VOut)
+
+        gmsh.model.mesh.field.setAsBackgroundMesh(self.field_counter)
+        # Increase field count
+        self.field_counter += 1
+        # Synchronize
+        gmsh.model.occ.synchronize()
+
     def new_layer(self, thickness, npts=10, label=None, dot_region=False, 
         dot_label=None, material=None, pdoping=0, ndoping=0):
         """ Creates a layer by extruding the bottom-most surface.
@@ -309,7 +336,7 @@ class DeviceGenerator:
 
         # keep track of bottom surfaces in case an additional layer is added
         self.bottom_surface = self.track_surface(extr_surf)
-        # Update regions related to dots    
+        # Update regions related to dots
         self._update_dot_vol(self.dot_tag, self.dot_volume, extr_surf, dot_region, 
             label=dot_label, material=material, pdoping=pdoping, ndoping=ndoping)
 
@@ -470,22 +497,22 @@ class DeviceGenerator:
             # Find volumes corresponding to dot region
             V = [e for e in extr_surf if e[0]==3] # All volumes created
             dot_below = dot[-1] # Entity tags for bottom most surfaces of dot
-            vol_indeces = []
+            vol_indices = []
             for v in V: 
                 # Check if the dot surface is a boundary of the dot volume
                 set_dot_below = set([(2, t) for t in dot_below])
                 bndry_of_v = set(gmsh.model.getBoundary([v], oriented=False))
                 intersection = set.intersection(set_dot_below, bndry_of_v)
                 if len(list(intersection)) != 0:
-                    vol_indeces.append(extr_surf.index(v))
+                    vol_indices.append(extr_surf.index(v))
             
             # Find bottom surface of volume
             # update dot_tags
-            dot.append([extr_surf[ix - 1][1] for ix in vol_indeces])
+            dot.append([extr_surf[ix - 1][1] for ix in vol_indices])
 
             if dot_region:
                 # Include the create volume in the dot volumes
-                vols = [extr_surf[ix][1] for ix in vol_indeces]
+                vols = [extr_surf[ix][1] for ix in vol_indices]
                 dot_volume[i].append(vols)
 
                 if label is None:
@@ -751,6 +778,48 @@ class DeviceGenerator:
         self.dot_counter += 1
 
         return surf
+
+    def set_dot_region_from_surfs(self, surfs, h=None):
+        """ Sets the quantum dot region from Gmsh physical surfaces.
+
+        Args:
+            surfs (string or list): String or list of strings labeling Gmsh 
+                physical surfaces below which quantum dots are expected to 
+                form.
+            h (float, optional): characteristic length of mesh inside dot 
+                region.
+        """
+        if isinstance(surfs,str):
+            surfs = [surfs]
+
+        # Allow entities to be accessed outside model
+        gmsh.model.occ.synchronize()
+        
+        # Get list of surface entity indices from physical surfaces
+        self.dot_tag = []
+        surf_entities = []
+        for phys_surf in surfs:
+            surfs_in_phys = self.get_ent_tag_from_name(phys_surf)
+            for surf in surfs_in_phys:
+                self.dot_tag.append([[surf]])
+                surf_entities.append(surf)
+        
+        # refine mesh in dot region
+        if h is not None:
+            self.new_constant_field(surf_entities, h)
+        # Allow entities to be accessed outside model
+        gmsh.model.occ.synchronize()
+
+        # Set number of quantum dots
+        self.dot_counter = len(surfs)
+        
+        # Update dot volumes
+        for _ in range(self.dot_counter):
+            self.dot_volume.append([])
+
+        # Reset top layer
+        self.setup_top_layer()
+
     
     def store_mat_properties(self, label, material, pdoping, ndoping):
         """ Store material properties in device attribute 'material_dict'
@@ -850,14 +919,14 @@ class DeviceGenerator:
         for j, dot in enumerate(self.dot_tag):
             # entity tags for the top layer
             tags = dot[0]
-            # Get all indeces of the dot tags before the boolean fragment
-            indeces = []
+            # Get all indices of the dot tags before the boolean fragment
+            indices = []
             for i, s in enumerate(surf):
                 if s[1] in tags:
-                    indeces.append(i)
+                    indices.append(i)
             # Get the new entity tags after the boolean fragment
             new = []
-            for index in indeces:
+            for index in indices:
                 new += [s[1] for s in frag_surf[1][index]]
             # Update the dot_tag attribute
             self.dot_tag[j] = [new]
