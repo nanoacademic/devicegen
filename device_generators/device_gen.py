@@ -277,6 +277,33 @@ class DeviceGenerator:
         # Synchronize
         gmsh.model.occ.synchronize()
 
+    def new_constant_field(self, surfs_list, VIn, VOut=None):
+        """ Create a box field
+
+        Args:
+        ---
+        surfs_list (list): Integers labeling all the surface entities in which
+            to modify the mesh size
+        VIn (scalar): characteristic length of field inside surfaces.
+        VOut (scalar): characteristic length of field outside surfaces.
+        """
+        # Clear any meshes already present
+        gmsh.model.mesh.clear(dimTags=[])
+
+        # Create constant field
+        gmsh.model.mesh.field.add("Constant", self.field_counter)
+        gmsh.model.mesh.field.setNumber(self.field_counter, "VIn", VIn)
+        gmsh.model.mesh.field.setNumbers(self.field_counter, "SurfacesList", 
+            surfs_list)
+        if VOut is not None:
+            gmsh.model.mesh.field.setNumber(self.field_counter, "VOut", VOut)
+
+        gmsh.model.mesh.field.setAsBackgroundMesh(self.field_counter)
+        # Increase field count
+        self.field_counter += 1
+        # Synchronize
+        gmsh.model.occ.synchronize()
+
     def new_layer(self, thickness, npts=10, label=None, dot_region=False, 
         dot_label=None, material=None, pdoping=0, ndoping=0):
         """ Creates a layer by extruding the bottom-most surface.
@@ -752,13 +779,15 @@ class DeviceGenerator:
 
         return surf
 
-    def set_dot_region_from_surfs(self, surfs):
+    def set_dot_region_from_surfs(self, surfs, h=None):
         """ Sets the quantum dot region from Gmsh physical surfaces.
 
         Args:
             surfs (string or list): String or list of strings labeling Gmsh 
                 physical surfaces below which quantum dots are expected to 
                 form.
+            h (float, optional): characteristic length of mesh inside dot 
+                region.
         """
         if isinstance(surfs,str):
             surfs = [surfs]
@@ -768,10 +797,18 @@ class DeviceGenerator:
         
         # Get list of surface entity indices from physical surfaces
         self.dot_tag = []
+        surf_entities = []
         for phys_surf in surfs:
             surfs_in_phys = self.get_ent_tag_from_name(phys_surf)
             for surf in surfs_in_phys:
                 self.dot_tag.append([[surf]])
+                surf_entities.append(surf)
+        
+        # refine mesh in dot region
+        if h is not None:
+            self.new_constant_field(surf_entities, h)
+        # Allow entities to be accessed outside model
+        gmsh.model.occ.synchronize()
 
         # Set number of quantum dots
         self.dot_counter = len(surfs)
