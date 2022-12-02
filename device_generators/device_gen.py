@@ -393,6 +393,8 @@ class DeviceGenerator:
             k = vol_index[i+1]
             side_surf += extr_surf[j+1:k-1]
         side_surf += extr_surf[vol_index[-1] + 1:]
+        # keep only unique surfaces
+        side_surf = list(set(side_surf))
         
         # Loop over all entities and assign a generic name: 'surf1', 'surf2', ...
         for e in side_surf:
