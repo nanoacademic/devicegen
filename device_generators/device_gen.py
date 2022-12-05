@@ -64,7 +64,7 @@ class DeviceGenerator:
     
     def new_top_layer(self, thickness, *bnd_params, npts=10, 
         surfs_to_extrude=None, label=None, material=None, pdoping=0, 
-        ndoping=0, bnd_label="top", bnd_type=None):
+        ndoping=0, bnd_label="top", bnd_type=None, color=None):
         """ Generate a top layer and gate.
         
         Args:
@@ -86,6 +86,7 @@ class DeviceGenerator:
         bnd_label (string): Label for the top of the extruded surface. 
         bnd_type (string): Type of boundary condition to enforce. The possibilities are
             for e.g. QTCAD are schottky, gate, or ohmic.
+        color (tuple): Color with which to identify layer
         """
         
         # Establish which surfaces need to be extruded 
@@ -114,6 +115,11 @@ class DeviceGenerator:
         surfs = [e[1] for e in self.track_surface(extr_surf)]
         self.label_surface(surfs, bnd_label, bnd_type, *bnd_params)
         
+        # Color layer if required
+        V = [(3, v) for v in V]
+        if color is not None:
+            gmsh.model.setColor(V, color[0], color[1], color[2])
+
         gmsh.model.occ.synchronize()
 
     
@@ -306,7 +312,7 @@ class DeviceGenerator:
 
     def new_layer(self, thickness, npts=10, label=None, dot_region=False, 
         dot_label=None, material=None, pdoping=0, ndoping=0, 
-        label_sides = False):
+        label_sides = False, color=None):
         """ Creates a layer by extruding the bottom-most surface.
 
         Args:
@@ -328,6 +334,7 @@ class DeviceGenerator:
                 Default: 0.
         label_sides (boolean): Whether to label the sides surfaces resulting
             from the extrusion.
+        color (tuple): Color with which to identify layer
         """
 
         self.first_layer = False
@@ -356,6 +363,10 @@ class DeviceGenerator:
         # Check which are not part of dot volumes
         V = [e for e in extr_surf if e[0]==3] # Volumes generated from extrusion
         volumes = [vol[1] for vol in V if vol[1] not in flat_dot_vol]
+
+        # Color layer if required
+        if color is not None:
+            gmsh.model.setColor(V, color[0], color[1], color[2])
 
         gmsh.model.occ.synchronize()  
 
