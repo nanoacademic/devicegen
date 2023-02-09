@@ -585,7 +585,7 @@ class DeviceGenerator:
         return ent_tag
 
 
-    def save_mesh(self, dim=3, mesh_name='mesh.msh2'):
+    def save_mesh(self, dim=3, mesh_name='mesh.msh2', order=1):
         """ Saves the generated mesh.
         
         Args:
@@ -593,9 +593,14 @@ class DeviceGenerator:
         dim (1, 2, or 3): dimension of the mesh to generate.
         mesh_name (string): name of output mesh. The extension will determine
             the mesh file type. QTCAD currently supports .msh2
+        order (1 or 2, optional): Order of the Lagrange interpolation to be 
+            used on the mesh. Default: 1.
         """
+        if order not in [1,2]:
+            raise ValueError("Mesh order must be 1 or 2.")
         # Create the mesh
         gmsh.model.mesh.generate(dim=dim)
+        gmsh.model.mesh.setOrder(order)
         gmsh.write(mesh_name)
 
     def save_geo(self, geo_name='geometry.geo_unrolled'):
