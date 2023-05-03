@@ -1,5 +1,13 @@
 # DeviceGen release notes
 
+## devicegen 1.0.0
+
+- Improved devicegen packaging (it is now possible to import a standard DeviceGenerator using ``from devicegen import DeviceGenerator``).
+- Allow second order meshing when producing and saving meshes.
+- Added feature that provides the ability to set the Gmsh GUI display color for device layers.
+- Fixed a minor bug which resulted in multiple surface names for the same surface.
+- Added the capability to label side surfaces after extrusion.
+
 ## devicegen 0.6.2
 
 Added the possibility to create a dot region from layout surfaces.
