@@ -1,4 +1,4 @@
-from device_generators.device_gen import DeviceGenerator
+from devicegen import DeviceGenerator
 import pathlib
 
 # Constants
