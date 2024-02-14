@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 setup(
     name="devicegen",
     packages=find_packages(),
-    version="1.0.2",
+    version="1.0.3",
     license='GPLv3+',
     author="Pericles Philippopoulos, Felix Beaudoin",
     author_email="pericles@nanoacademic.com",
