@@ -88,7 +88,7 @@ class DeviceGenerator:
                     Default: 0.
             bnd_label (string): Label for the top of the extruded surface. 
             bnd_type (string): Type of boundary condition to enforce. The 
-                possibilities are e.g. for QTCAD are schottky, gate, or ohmic.
+                possibilities (for QTCAD) are schottky, gate, or ohmic.
             color (tuple): Color with which to identify layer
         """
         
