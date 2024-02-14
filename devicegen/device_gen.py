@@ -135,7 +135,7 @@ class DeviceGenerator:
                 consideration. (See device.py for types boundary conditions 
                 available in QTCAD)
             bnd_type (string): Type of boundary condition to enforce. The 
-                possibilities are e.g. for QTCAD are schottky, gate, or ohmic.
+                possibilities (for QTCAD) are schottky, gate, or ohmic.
         """
         # Check that we are not trying to label the top surface
         if self.first_layer:
@@ -190,8 +190,8 @@ class DeviceGenerator:
             new_name (string): Phsysical name
             *bnd_params: arguments for type of boundary condition under consideration.
                 (See device.py for types boundary conditions available in QTCAD)
-            bnd_type (string): Type of boundary condition to enforce. The possibilities are
-                for e.g. QTCAD are schottky, gate, or ohmic.
+            bnd_type (string): Type of boundary condition to enforce. The 
+                possibilities (for QTCAD) are schottky, gate, or ohmic.
         
         Returns:
             (int): Physical tag of the new physical group.
@@ -705,7 +705,7 @@ class DeviceGenerator:
                 consideration. (See device.py for types boundary conditions 
                 available in QTCAD)
             bnd_type (string): Type of boundary condition to enforce. The
-                possibilities are e.g. for QTCAD are schottky, gate, or ohmic.
+                possibilities (for QTCAD) are schottky, gate, or ohmic.
 
         Note:
             By using a list of strings for the old_label argument, multiple 
@@ -941,7 +941,7 @@ class DeviceGenerator:
         ---
         label (string): Label for the boundary under consideration
         bnd_type (string): Type of boundary condition to enforce. The 
-            possibilities are for e.g. QTCAD are schottky, gate, or ohmic.
+            possibilities (for QTCAD) are schottky, gate, or ohmic.
         *bnd_params: arguments for type of boundary condition under consideration.
             (See device.py for types boundary conditions available in QTCAD)
         
