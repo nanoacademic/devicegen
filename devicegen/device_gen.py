@@ -677,7 +677,8 @@ class DeviceGenerator:
         if order not in [1,2]:
             raise ValueError("Mesh order must be 1 or 2.")
         # Create the mesh
-        gmsh.model.mesh.generate(dim=dim)
+        for i in range(dim):
+            gmsh.model.mesh.generate(dim=i+1)
         gmsh.model.mesh.setOrder(order)
         gmsh.write(mesh_name)
 
