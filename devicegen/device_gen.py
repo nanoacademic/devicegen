@@ -62,31 +62,34 @@ class DeviceGenerator:
     new_top_layer: Generate a top layer and gate.
     """
     
-    def new_top_layer(self, thickness, *bnd_params, npts=10, 
-        surfs_to_extrude=None, label=None, material=None, pdoping=0, 
-        ndoping=0, bnd_label="top", bnd_type=None, color=None):
+    def new_top_layer(
+            self, thickness: float, *bnd_params, npts: int=10, 
+            surfs_to_extrude: list=None, label: str=None, material=None,
+            pdoping: float=0, ndoping: float=0, bnd_label: str="top", 
+            bnd_type: str=None, color: tuple=None
+            ) -> None:
         """ Generate a top layer and gate.
         
         Args:
-        ---
-        thickness (scalar): Thickness of the new layer.
-        *bnd_params: arguments for type of boundary condition under consideration.
-            (See device.py for types boundary conditions available in QTCAD)
-        npts (int): number of points along the extruded dimension. 
-        surfs_to_extrude (list of strings): Names of surfaces over which we want 
-            to define a top gate. Defaults to None, in which case the surfaces stored
-            in the attribute 'top_surface' are used.
-        material (material object): Material the dot region is made of.
-            The material object may be a string, or an object used in an 
-            external finite element library to specify materials (e.g. QTCAD).
-        pdoping (scalar): The density of acceptors in cm^-3.
-                Default: 0.
-        ndoping (scalar): The density of donors in cm^-3.
-                Default: 0.
-        bnd_label (string): Label for the top of the extruded surface. 
-        bnd_type (string): Type of boundary condition to enforce. The possibilities are
-            for e.g. QTCAD are schottky, gate, or ohmic.
-        color (tuple): Color with which to identify layer
+            thickness (scalar): Thickness of the new layer.
+            *bnd_params: arguments for type of boundary condition under 
+                consideration. (See device.py for types boundary conditions 
+                available in QTCAD)
+            npts (int): number of points along the extruded dimension. 
+            surfs_to_extrude (list of strings): Names of surfaces over which we
+                want to define a top gate. Defaults to None, in which case the 
+                surfaces stored in the attribute 'top_surface' are used.
+            material (material object): Material the dot region is made of.
+                The material object may be a string, or an object used in an 
+                external finite element library to specify materials (e.g. QTCAD).
+            pdoping (scalar): The density of acceptors in cm^-3.
+                    Default: 0.
+            ndoping (scalar): The density of donors in cm^-3.
+                    Default: 0.
+            bnd_label (string): Label for the top of the extruded surface. 
+            bnd_type (string): Type of boundary condition to enforce. The 
+                possibilities (for QTCAD) are schottky, gate, or ohmic.
+            color (tuple): Color with which to identify layer
         """
         
         # Establish which surfaces need to be extruded 
@@ -123,16 +126,16 @@ class DeviceGenerator:
         gmsh.model.occ.synchronize()
 
     
-    def label_bottom(self, label, *bnd_params, bnd_type=None):
+    def label_bottom(self, label: str, *bnd_params, bnd_type: str=None) -> None:
         """ Label the bottom surface of the device
 
         Args:
-        ---
-        label (string): Label for the bottom surface. 
-        *bnd_params: arguments for type of boundary condition under consideration.
-            (See device.py for types boundary conditions available in QTCAD)
-        bnd_type (string): Type of boundary condition to enforce. The possibilities are
-            for e.g. QTCAD are schottky, gate, or ohmic.
+            label (string): Label for the bottom surface. 
+            *bnd_params: arguments for type of boundary condition under 
+                consideration. (See device.py for types boundary conditions 
+                available in QTCAD)
+            bnd_type (string): Type of boundary condition to enforce. The 
+                possibilities (for QTCAD) are schottky, gate, or ohmic.
         """
         # Check that we are not trying to label the top surface
         if self.first_layer:
@@ -148,20 +151,24 @@ class DeviceGenerator:
         # Storing boundary condition
         self.store_bnd_conditions(label, bnd_type, *bnd_params)
 
-    def label_volume(self, ent_tags, new_name, material=None, 
-        pdoping=0, ndoping=0):
+    def label_volume(
+            self, ent_tags: list, new_name: str, material=None, 
+            pdoping: float=0, ndoping: float=0
+            ) -> int:
         """ Gives a physical name to a volume entity.
         
         Args:
-        ---
-        ent_tags (list): Entities to name.
-        new_name (string): Phsysical name
-        material (material object): Material the dot region is made of. To be used if 
-            the goal is to create a device. Defaults to silicon.
-        pdoping (scalar): The density of acceptors in cm^-3.
-                Default: 0.
-        ndoping (scalar): The density of donors in cm^-3.
-                Default: 0.
+            ent_tags (list): Entities to name.
+            new_name (string): Phsysical name
+            material (material object): Material the dot region is made of. To be used if 
+                the goal is to create a device. Defaults to silicon.
+            pdoping (scalar): The density of acceptors in cm^-3.
+                    Default: 0.
+            ndoping (scalar): The density of donors in cm^-3.
+                    Default: 0.
+
+        Returns:
+            (int): Physical tag of the new physical group.
         """
 
         # Label volume
@@ -173,17 +180,22 @@ class DeviceGenerator:
         return new_phys_group
 
 
-    def label_surface(self, ent_tags, new_name, bnd_type, *bnd_params):
+    def label_surface(
+            self, ent_tags: list, new_name: str, bnd_type: str, *bnd_params
+            ) -> int:
         """ Gives a physical name to a surface entity.
         
         Args:
-        ---
-        ent_tags (list): Entities to name.
-        new_name (string): Phsysical name
-        *bnd_params: arguments for type of boundary condition under consideration.
-            (See device.py for types boundary conditions available in QTCAD)
-        bnd_type (string): Type of boundary condition to enforce. The possibilities are
-            for e.g. QTCAD are schottky, gate, or ohmic.
+            ent_tags (list): Entities to name.
+            new_name (string): Phsysical name
+            *bnd_params: arguments for type of boundary condition under consideration.
+                (See device.py for types boundary conditions available in QTCAD)
+            bnd_type (string): Type of boundary condition to enforce. The 
+                possibilities (for QTCAD) are schottky, gate, or ohmic.
+        
+        Returns:
+            (int): Physical tag of the new physical group.
+        
         """
         # Label surface
         new_phys_group = self.label_entity(2, ent_tags, new_name)
@@ -193,15 +205,19 @@ class DeviceGenerator:
     
         return new_phys_group
 
-    def label_entity(self, dim, ent_tags, new_name, verbose=False):
+    def label_entity(
+            self, dim: int, ent_tags: list, new_name: str, verbose: bool=False
+            ) -> int:
         """ Gives a physical name to an entity.
 
         Args:
-        ---
-        dim (2 or 3): dimension of the entity to be named.
-        ent_tags (list): Entities to name.
-        new_name (string): Phsysical name
-        verbose (boolean): If warning should be printed or not
+            dim (2 or 3): dimension of the entity to be named.
+            ent_tags (list): Entities to name.
+            new_name (string): Phsysical name
+            verbose (boolean): If warning should be printed or not
+
+        Returns:
+            (int): Physical tag of the new physical group.
         """
         for tag in ent_tags:
             # Get the pysical group
@@ -236,7 +252,7 @@ class DeviceGenerator:
 
         return new_phys_group
 
-    def min_field(self):
+    def min_field(self) -> None:
         """ Uses the minimum of all defined fields as the background mesh
         field.
         """
@@ -252,17 +268,19 @@ class DeviceGenerator:
         # Update counter
         self.field_counter+=1
 
-    def new_box_field(self, xmin, xmax, ymin, ymax, VIn, VOut=None):
+    def new_box_field(
+            self, xmin: float, xmax: float, ymin: float, ymax: float,
+            VIn: float, VOut: float=None
+            ) -> None:
         """ Create a box field
 
         Args:
-        ---
-        VIn (scalar): characteristic length of field inside box.
-        VOut (scalar): characteristic length of field outside box.
-        xmin (scalar): minimal x value of box.
-        xmax (scalar): maximal x value of box.
-        ymin (scalar): minimal y value of box.
-        ymax (scalar): maximal y value of box.
+            VIn (scalar): characteristic length of field inside box.
+            VOut (scalar): characteristic length of field outside box.
+            xmin (scalar): minimal x value of box.
+            xmax (scalar): maximal x value of box.
+            ymin (scalar): minimal y value of box.
+            ymax (scalar): maximal y value of box.
         """
         # Clear any meshes already present
         gmsh.model.mesh.clear(dimTags=[])
@@ -283,15 +301,16 @@ class DeviceGenerator:
         # Synchronize
         gmsh.model.occ.synchronize()
 
-    def new_constant_field(self, surfs_list, VIn, VOut=None):
+    def new_constant_field(
+            self, surfs_list: list, VIn: float, VOut: float=None
+            ) -> None:
         """ Create a box field
 
         Args:
-        ---
-        surfs_list (list): Integers labeling all the surface entities in which
-            to modify the mesh size
-        VIn (scalar): characteristic length of field inside surfaces.
-        VOut (scalar): characteristic length of field outside surfaces.
+            surfs_list (list): Integers labeling all the surface entities in 
+                which to modify the mesh size
+            VIn (scalar): characteristic length of field inside surfaces.
+            VOut (scalar): characteristic length of field outside surfaces.
         """
         # Clear any meshes already present
         gmsh.model.mesh.clear(dimTags=[])
@@ -310,31 +329,33 @@ class DeviceGenerator:
         # Synchronize
         gmsh.model.occ.synchronize()
 
-    def new_layer(self, thickness, npts=10, label=None, dot_region=False, 
-        dot_label=None, material=None, pdoping=0, ndoping=0, 
-        label_sides = False, color=None):
+    def new_layer(
+            self, thickness: float, npts: int=10, label: str=None, 
+            dot_region: bool=False, dot_label: str=None, material=None,
+            pdoping: float=0, ndoping: float=0, label_sides: bool=False,
+            color: tuple=None
+            ) -> None:
         """ Creates a layer by extruding the bottom-most surface.
 
         Args:
-        ---
-        thickness (scalar): Thickness of the new layer.
-        npts (int): number of points along the extruded dimension. 
-        label (string): Label (physical name) for the layer. If None, generic 
-            name used, e.g. 'Volume1'
-        dot_region (boolean): If True, will consider the volume when creating 
-            the dot region under the 'dot_rectangles'
-        dot_label (string): Physical name for the dot region in the given 
-            layer. If None, a generic name is used.
-        material (material object): Material the dot region is made of.
-            The material object may be a string, or an object used in an 
-            external finite element library to specify materials (e.g. QTCAD).
-        pdoping (scalar): The density of acceptors in cm^-3.
-                Default: 0.
-        ndoping (scalar): The density of donors in cm^-3.
-                Default: 0.
-        label_sides (boolean): Whether to label the sides surfaces resulting
-            from the extrusion.
-        color (tuple): Color with which to identify layer
+            thickness (scalar): Thickness of the new layer.
+            npts (int): number of points along the extruded dimension. 
+            label (string): Label (physical name) for the layer. If None, generic 
+                name used, e.g. 'Volume1'
+            dot_region (boolean): If True, will consider the volume when creating 
+                the dot region under the 'dot_rectangles'
+            dot_label (string): Physical name for the dot region in the given 
+                layer. If None, a generic name is used.
+            material (material object): Material the dot region is made of.
+                The material object may be a string, or an object used in an 
+                external finite element library to specify materials (e.g. QTCAD).
+            pdoping (scalar): The density of acceptors in cm^-3.
+                    Default: 0.
+            ndoping (scalar): The density of donors in cm^-3.
+                    Default: 0.
+            label_sides (boolean): Whether to label the sides surfaces resulting
+                from the extrusion.
+            color (tuple): Color with which to identify layer
         """
 
         self.first_layer = False
@@ -383,13 +404,12 @@ class DeviceGenerator:
 
         gmsh.model.occ.synchronize()  
 
-    def label_sides(self, extr_surf):
+    def label_sides(self, extr_surf: list) -> None:
         """ Label side surfaces generated by an extrusion
 
         Args:
-        ---
-        extr_surf (list of tuples): output of gmsh.model.occ.extrude call for
-            which we want to label the side surfaces.
+            extr_surf (list of tuples): output of gmsh.model.occ.extrude call 
+                for which we want to label the side surfaces.
         """
         # Find indices that contain volumes
         vol_index = []
@@ -417,14 +437,16 @@ class DeviceGenerator:
             gmsh.model.occ.synchronize()
 
 
-    def get_volumes(self, name, layer=None):
+    def get_volumes(self, name: str, layer=None) -> list:
         """ Get the volumes under a surface with a given name
+        
         Args:
-        ---
-        name (string): name of surface under which we want the volume entity
-            tags
-        layer (None or int): Specifies the layer for which we want the volume 
-            entity tags. If None, returns volumes for all layers.     
+            name (string): name of surface under which we want the volume
+                entity tags
+            layer (None or int): Specifies the layer for which we want the 
+                volume entity tags. If None, returns volumes for all layers.
+        Returns:
+            (list): List of volume entity tags.
         """
         # Entitity tags for a certain surface naem
         ents = self.vol_entities[name][1::2]
@@ -437,17 +459,20 @@ class DeviceGenerator:
             
         return [e[1] for e in ents]
       
-    def get_surfaces(self, name, layer=None):
+    def get_surfaces(self, name: str, layer=None) -> list:
         """ Get the surfaces under a surface with a given name
+        
         Args:
-        ---
-        name (string): name of surface under which we want the surface entity
-            tags
-        layer (None or int): Specifies the layer for which we want the surface 
-            entity tags. If None, returns surfaces between all layers.
+            name (string): name of surface under which we want the surface entity
+                tags
+            layer (None or int): Specifies the layer for which we want the surface 
+                entity tags. If None, returns surfaces between all layers.
+        
+        Returns:
+            (list): List of volume entity tags for a given layer.
 
         Note:
-        If layer = 0 then the output is the surfaces named name.     
+            If layer = 0 then the output is the surfaces named name.     
         """
         # Entitity tags for a certain surface name
         ents = self.vol_entities[name][0::2]
@@ -460,15 +485,17 @@ class DeviceGenerator:
             
         return [e[1] for e in ents]
 
-    def _update_vol_entities(self, surf_to_extr, extr_surf, vol_entities):
+    def _update_vol_entities(
+            self, surf_to_extr: list, extr_surf: list, vol_entities: dict
+            ) -> None:
         """ Update attribute vol_entities to include the volumes and surfaces
         generate by creating a new layer.
+        
         Args:
-        ---
-        surf_to_extr (list): List of surface entities that are extruded.
-        extr_surf (list): List of entities generated by the extrusion in the 
-            method new_layer.
-        vol_entities (dictionary): Dictionary keeping track of volumes.
+            surf_to_extr (list): List of surface entities that are extruded.
+            extr_surf (list): List of entities generated by the extrusion in 
+                the method new_layer.
+            vol_entities (dictionary): Dictionary keeping track of volumes.
         
         """
         vols = [e for e in extr_surf if e[0] == 3]
@@ -497,11 +524,13 @@ class DeviceGenerator:
             vol_entities[key] = vol_entities[key] + [new_surfs]
     
 
-    def track_surface(self, extr_surf):
+    def track_surface(self, extr_surf: list) -> list:
         """ Keep track of surface entities.
+        
         Args:
-        ---
-        extr_surf (list): Entities created by an extrusion.
+            extr_surf (list): Entities created by an extrusion.
+        Returns
+            (list): List of surfaces create by an extrusion.
         """
         surface = []
         # Volumes generated from extrusion
@@ -512,30 +541,31 @@ class DeviceGenerator:
         return surface
 
 
-    def _update_dot_vol(self, dot_tags, dot_volume, extr_surf, dot_region, label=None,
-        material=None, pdoping=0, ndoping=0):
+    def _update_dot_vol(
+            self, dot_tags: list, dot_volume: list, extr_surf: list, dot_region: bool, label=None,
+            material=None, pdoping: float=0, ndoping: float=0
+            ) -> None:
         """ Updates the attributes dot_volume and dot_tag and labels dot region.
         Args:
-        ---
-        dot_tag (list): Tags of bottom most surfaces in x-y plane where we expect
-            electrons/holes to be localized.
-        dot_volume (list): Tags of the different volumes that we expect
-            to contain dots.
-        surf_to_extrude (list of gmsh entities): list of surfaces that are extruded.
-        extr_surf (list of gmsh entities): entities created from gmsh's extrusion 
-            operation
-        dot_region (boolean): If true, the attribute dot_volume is modified.
-            The volumes created in the layer by extruding the surfaces in dot_tag 
-            are appended.
-        label (string): Physical name for the dot region in the given layer. If
-            None, a generic name is used. 
-        material (material object): Material the dot region is made of.
-            The material object may be a string, or an object used in an 
-            external finite element library to specify materials (e.g. QTCAD).
-        pdoping (scalar): The density of acceptors in cm^-3.
-                Default: 0.
-        ndoping (scalar): The density of donors in cm^-3.
-                Default: 0.
+            dot_tag (list): Tags of bottom most surfaces in x-y plane where we expect
+                electrons/holes to be localized.
+            dot_volume (list): Tags of the different volumes that we expect
+                to contain dots.
+            surf_to_extrude (list of gmsh entities): list of surfaces that are extruded.
+            extr_surf (list of gmsh entities): entities created from gmsh's extrusion 
+                operation
+            dot_region (boolean): If true, the attribute dot_volume is modified.
+                The volumes created in the layer by extruding the surfaces in dot_tag 
+                are appended.
+            label (string): Physical name for the dot region in the given layer. If
+                None, a generic name is used. 
+            material (material object): Material the dot region is made of.
+                The material object may be a string, or an object used in an 
+                external finite element library to specify materials (e.g. QTCAD).
+            pdoping (scalar): The density of acceptors in cm^-3.
+                    Default: 0.
+            ndoping (scalar): The density of donors in cm^-3.
+                    Default: 0.
         """
         gmsh.model.occ.synchronize()
         # Convert label to a list if it is a string.  
@@ -577,18 +607,16 @@ class DeviceGenerator:
                 # Store material properties
                 self.store_mat_properties(dot_label, material, pdoping, ndoping)
                        
-    def get_tag_from_name(self, name, dim=2):
+    def get_tag_from_name(self, name: str, dim: int=2) -> None:
         """ Get the physical tags associated with a physical name.
         
         Args:
-        ---
-        name (string or list of strings): Names for which we want the 
-            physical tags.
+            name (string or list of strings): Names for which we want the 
+                physical tags.
 
         Returns:
-        ---
-        tags (int or list of ints): Physical tags associated with the 
-            physical names.
+            (int or list of ints): Physical tags associated with the 
+                physical names.
         """
         # Check if input is a string or a list
         single = False
@@ -610,18 +638,16 @@ class DeviceGenerator:
         else:
             return tags
     
-    def get_ent_tag_from_name(self, name, dim=2):
+    def get_ent_tag_from_name(self, name: str, dim: int=2) -> None:
         """ Get the entity tags associated with a physical name.
         
         Args:
-        ---
-        name (string or list of strings): Names for which we want the 
-            entity tags.
+            name (string or list of strings): Names for which we want the 
+                entity tags.
 
         Returns:
-        ---
-        tags (int or list of ints): Entity tags associated with the 
-            physical names.
+            (int or list of ints): Entity tags associated with the 
+                physical names.
         """
         # Get physical tags from name
         phys_tag = self.get_tag_from_name(name, dim)
@@ -636,16 +662,17 @@ class DeviceGenerator:
         return ent_tag
 
 
-    def save_mesh(self, dim=3, mesh_name='mesh.msh2', order=1):
+    def save_mesh(
+            self, dim: int=3, mesh_name: str='mesh.msh2', order: int=1
+            ) -> None:
         """ Saves the generated mesh.
         
         Args:
-        ---
-        dim (1, 2, or 3): dimension of the mesh to generate.
-        mesh_name (string): name of output mesh. The extension will determine
-            the mesh file type. QTCAD currently supports .msh2
-        order (1 or 2, optional): Order of the Lagrange interpolation to be 
-            used on the mesh. Default: 1.
+            dim (1, 2, or 3): dimension of the mesh to generate.
+            mesh_name (string): name of output mesh. The extension will 
+                determine the mesh file type. QTCAD currently supports .msh2
+            order (1 or 2, optional): Order of the Lagrange interpolation to be 
+                used on the mesh. Default: 1.
         """
         if order not in [1,2]:
             raise ValueError("Mesh order must be 1 or 2.")
@@ -654,36 +681,36 @@ class DeviceGenerator:
         gmsh.model.mesh.setOrder(order)
         gmsh.write(mesh_name)
 
-    def save_geo(self, geo_name='geometry.geo_unrolled'):
+    def save_geo(self, geo_name: str='geometry.geo_unrolled') -> None:
         """ Saves the geometry.
         
         Args:
-        ---
-        geo_name (string): name of the geometry file. The extension should be
-            .geo_unrolled
+            geo_name (string): name of the geometry file. The extension should be
+                .geo_unrolled
         """
         # Create the geo file
         gmsh.write(geo_name)
 
 
-    def relabel_surface(self, old_label, new_label, *bnd_params, bnd_type=None):
+    def relabel_surface(
+            self, old_label: str, new_label: str, *bnd_params, bnd_type=None
+            ) -> None:
         """Relabel surface using their old label. This function can also be 
             used to set the boundary condition on the surface being relabelled.
         
         Args:
-        ---
-        old_label (string or list of strings): Current labels of surfaces
-        new_label (string): String we with to relabel with
-        *bnd_params: arguments for type of boundary condition under consideration.
-            (See device.py for types boundary conditions available in QTCAD)
-        bnd_type (string): Type of boundary condition to enforce. The possibilities are
-            for e.g. QTCAD are schottky, gate, or ohmic.
+            old_label (string or list of strings): Current labels of surfaces
+            new_label (string): String we with to relabel with
+            *bnd_params: arguments for type of boundary condition under 
+                consideration. (See device.py for types boundary conditions 
+                available in QTCAD)
+            bnd_type (string): Type of boundary condition to enforce. The
+                possibilities (for QTCAD) are schottky, gate, or ohmic.
 
         Note:
-        ---
-        By using a list of strings for the old_label argument, multiple 
-            physical surfaces can be grouped together under a single physical 
-            name
+            By using a list of strings for the old_label argument, multiple 
+                physical surfaces can be grouped together under a single physical 
+                name
         """
 
         # If no new_label provided, remove physical groups
@@ -724,12 +751,11 @@ class DeviceGenerator:
         return ent_tags
 
 
-    def split_surface(self, name):
+    def split_surface(self, name: str) -> None:
         """ Splits a physical surface into seperate physical surfaces for each
             entity
         Args:
-        ---
-        name (string): name of physical surface to split.
+            name (string): name of physical surface to split.
         """
         # Entities associated with name
         ents = self.get_ent_tag_from_name(name)
@@ -755,15 +781,17 @@ class DeviceGenerator:
         self.vol_entities_top.pop(name, None)
 
 
-    def _update_vol_entity_keys(self, ent_tags, old_label, new_label):
+    def _update_vol_entity_keys(
+            self, ent_tags: list, old_label: str, new_label: str
+            ) -> None:
         """Update the keys of the attribute vol_entities as the names of 
         the surfaces change.
 
         Args:
-        ---
-        ent_tags (list of entities): Entities labelled with old_label.
-        old_label (string or list of strings): Physical groups being relabeled
-        new_label (string): New label for physical group.
+            ent_tags (list of entities): Entities labelled with old_label.
+            old_label (string or list of strings): Physical groups being 
+                relabeled
+            new_label (string): New label for physical group.
         """
         # If old_label is a string, recast as list
         if isinstance(old_label, str):
@@ -778,12 +806,11 @@ class DeviceGenerator:
         self.vol_entities_top[new_label] = []
         self.vol_entities_top[new_label].append([(2,e) for e in ent_tags])
 
-    def remove_phys_groups(self, label):
+    def remove_phys_groups(self, label) -> None:
         """ Remove physical groups from the model.
         Args:
-        ---
-        label(string or list of strings): Names of the physical groups we 
-            wish to remove from the model.
+            label(string or list of strings): Names of the physical groups we 
+                wish to remove from the model.
         """
         # If single label, recast as list
         if isinstance(label, str):
@@ -800,21 +827,25 @@ class DeviceGenerator:
         # Remove groups
         gmsh.model.removePhysicalGroups(phys_tags)
 
-    def new_dot_rectangle(self, x, y, dx, dy, h=None):
+    def new_dot_rectangle(
+            self, x: float, y: float, dx: float, dy: float, h=None
+            ) -> int:
         """ Creates a rectangle where we expect an electron/hole to be
         localized in the x and y directions.
 
         Args:
-        ---
-        x (float): Left most position of rectangle i.e. smallest x coordinate.
-        y (float): Bottom most position of rectangle i.e. smallest y coordinate.
-        dx (float): x + dx is the largest x coordinate of a point in the rectangle
-        dy (float): y + dy is the largest y coordinate of a point in the rectangle
-        h (float): characteristic length of mesh inside dot rectangle.
+            x (float): Left most position of rectangle i.e. smallest x 
+                coordinate.
+            y (float): Bottom most position of rectangle i.e. smallest y 
+                coordinate.
+            dx (float): x + dx is the largest x coordinate of a point in the
+                rectangle
+            dy (float): y + dy is the largest y coordinate of a point in the 
+                rectangle
+            h (float): characteristic length of mesh inside dot rectangle.
 
         Return:
-        ---
-        tag (int): Tag of the rectangle.
+            (int): Tag of the rectangle.
         
         """
 
@@ -838,7 +869,7 @@ class DeviceGenerator:
 
         return surf
 
-    def set_dot_region_from_surfs(self, surfs, h=None):
+    def set_dot_region_from_surfs(self, surfs, h=None) -> None:
         """ Sets the quantum dot region from Gmsh physical surfaces.
 
         Args:
@@ -880,18 +911,20 @@ class DeviceGenerator:
         self.setup_top_layer()
 
     
-    def store_mat_properties(self, label, material, pdoping, ndoping):
+    def store_mat_properties(
+            self, label: str, material: str, pdoping: float, ndoping: float
+            ) -> None:
         """ Store material properties in device attribute 'material_dict'
         
         Args:
-        ---
-        label (string): Label (physical name) for the volume considered.
-       material (material object): Material the dot region is made of.
-            The material object may be a string, or an object used in an 
-            external finite element library to specify materials (e.g. QTCAD).
-        pdoping (scalar): The density of acceptors in cm^-3.
+            label (string): Label (physical name) for the volume considered.
+            material (material object): Material the dot region is made of.
+                The material object may be a string, or an object used in an 
+                external finite element library to specify materials (e.g. 
+                QTCAD).
+            pdoping (scalar): The density of acceptors in cm^-3.
                 Default: 0.
-        ndoping (scalar): The density of donors in cm^-3.
+            ndoping (scalar): The density of donors in cm^-3.
                     Default: 0.
         """
         self.material_dict[label] = {
@@ -900,16 +933,18 @@ class DeviceGenerator:
             'ndoping':ndoping
             }
 
-    def store_bnd_conditions(self, label, bnd_type, *bnd_params):
-        """ Store boundary condition information in the device attribute 'bnd_dict'
+    def store_bnd_conditions(self, label: str, bnd_type: str, *bnd_params) -> None:
+        """ Store boundary condition information in the device attribute 
+        'bnd_dict'
 
         Args:
         ---
         label (string): Label for the boundary under consideration
+        bnd_type (string): Type of boundary condition to enforce. The 
+            possibilities (for QTCAD) are schottky, gate, or ohmic.
         *bnd_params: arguments for type of boundary condition under consideration.
             (See device.py for types boundary conditions available in QTCAD)
-        bnd_type (string): Type of boundary condition to enforce. The possibilities are
-            for e.g. QTCAD are schottky, gate, or ohmic.
+        
         """
         if bnd_type is not None:
             self.bnd_dict[label] = {
@@ -918,16 +953,15 @@ class DeviceGenerator:
             }
     
 
-    def get_names(self, dim):
+    def get_names(self, dim: int) -> list:
         """ Get names of all the physical groups of a given dimension.
 
         Arg:
-        ---
-        dim (int): dimension of the physical groups for which the names are wanted
+            dim (int): dimension of the physical groups for which the names are
+                wanted
 
         Returns:
-        ---
-        names (list): List of names
+            (list): List of names
         
         """
         
@@ -941,7 +975,7 @@ class DeviceGenerator:
         
         return phys_names
 
-    def _label_surfaces(self):
+    def _label_surfaces(self) -> None:
         """ Gives generic name to all surfaces generated from the layout file
         """
         # Initialize attribute that keeps track of volume entities
@@ -963,15 +997,15 @@ class DeviceGenerator:
 
             gmsh.model.occ.synchronize()
 
-    def _update_dot_frag(self, surf, frag_surf):
+    def _update_dot_frag(self, surf: list, frag_surf: list) -> None:
         """ Updates the dot_tag attribute if any dot rectangle overlaps with 
         another region. 
 
         Args:
-        ---
-        surf (list of entity tags): Entity tags before a boolean fragment.
-        frag_surf (List of list of entity tags): The output of the
-            gmsh.model.occ.fragment method which was applied on the top surface 
+            surf (list of entity tags): Entity tags before a boolean fragment.
+            frag_surf (List of list of entity tags): The output of the
+                gmsh.model.occ.fragment method which was applied on the top 
+                surface 
         """
         
         # For all dots being tracked
@@ -990,10 +1024,10 @@ class DeviceGenerator:
             # Update the dot_tag attribute
             self.dot_tag[j] = [new]
 
-    def setup_top_layer(self):
+    def setup_top_layer(self) -> None:
         """ Set up top 'mask' layer of device
         """
-        # Make sure only that no additional layers have been created
+        # Make sure that no additional layers have been created
         if not self.first_layer:
             raise ValueError('Must setup top layer before adding new layers')
 
@@ -1017,7 +1051,9 @@ class DeviceGenerator:
         # Update dot tags
         self._update_dot_frag(surfaces, frag_surf)
 
-        # store surfaces as a device attribute
+        # store top and bottom surfaces as a device attribute
+        # Only the layout is currently set: the top and bottom surfaces are the
+        # same
         self.bottom_surface = copy.deepcopy(gmsh.model.getEntities(2))
         self.top_surface = copy.deepcopy(gmsh.model.getEntities(2))
 
@@ -1027,26 +1063,26 @@ class DeviceGenerator:
         # Synchronize
         gmsh.model.occ.synchronize()
 
-    def view(self):
+    def view(self) -> None:
         """ Open gmsh GUI to visualize.
         """
         gmsh.fltk.run()
 
     def __init__(
-        self, file_path, outfile='parsed.geo', h=10, to_terminal=False
+        self, file_path: str, outfile: str='parsed.geo', h: float=10,
+        to_terminal: bool=False
         ):
         """ Constructor for the DeviceGenerator class.
         Args:
-        ---
-        file_path (string): Path to .gds, .geo, or .geo_unrolled file where the
-            2D gate pattern is saved.
-        outfile (string): Path to .geo file that is created from .gds file and
-            that will be loaded into gmsh.
-        h (scalar, optional): Maximal in-plane characteristic length of the
-            mesh. Here, the "plane" is that of the layout. Default value is 10
-            (the units are the same as the layout file).
-        to_terminal (boolean, optional): whether or not to print gmsh outputs
-            to terminal.
+            file_path (string): Path to .gds, .geo, or .geo_unrolled file where the
+                2D gate pattern is saved.
+            outfile (string): Path to .geo file that is created from .gds file and
+                that will be loaded into gmsh.
+            h (scalar, optional): Maximal in-plane characteristic length of the
+                mesh. Here, the "plane" is that of the layout. Default value is 10
+                (the units are the same as the layout file).
+            to_terminal (boolean, optional): whether or not to print gmsh outputs
+                to terminal.
 
         """
         # Since no layers have been created, we are at the first layer
@@ -1056,7 +1092,7 @@ class DeviceGenerator:
         # No top surface yet
         self.top_surface = []
         
-        # Initializeing counters, used for naming conventions
+        # Initializing counters, used for naming conventions
         self.layer_counter = 1 # layers
         self.s_counter = 1 # surfaces
         self.dot_counter = 1 # dots
@@ -1087,6 +1123,13 @@ class DeviceGenerator:
         gmsh.option.setNumber("General.Terminal", int(to_terminal))
         # Set up layout and min mesh size
         gmsh.option.setNumber('Mesh.MeshSizeMax', h)
+        # Additional Options
+        # Turn off otimization related to boolean transforms - elimantes issues
+        # related to conformal meshes introduced in gmsh 4.10 
+        # (see e.g. https://gitlab.onelab.info/gmsh/gmsh/-/issues/1928)
+        gmsh.option.setNumber('Geometry.OCCFastUnbind', 0)  
+
+        # Load file
         gmsh.open(geo_file)
         gmsh.model.occ.synchronize()
         
