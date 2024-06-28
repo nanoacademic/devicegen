@@ -399,6 +399,22 @@ class DeviceGenerator:
         gmsh.model.setPhysicalName(3, physical_volume, label)
         self.layer_counter += 1
 
+        phys_tags = self.get_tag_from_name(label, dim=3)
+        tags = gmsh.model.getEntitiesForPhysicalGroup(3, phys_tags)
+        tags = tags.tolist()
+        if isinstance(phys_tags, int):
+            phys_tags = [phys_tags]
+
+        if  physical_volume not in phys_tags:
+            phys_tags.append(physical_volume)
+            for idx , vol in enumerate(volumes):
+                tags.append(vol)
+            phys_tags = [(3, pt) for pt in phys_tags]
+            gmsh.model.removePhysicalGroups(phys_tags)
+
+            physical_volu = gmsh.model.addPhysicalGroup(3, tags)
+            gmsh.model.setPhysicalName(3, physical_volu, label)
+        
         # Store material properties
         self.store_mat_properties(label, material, pdoping, ndoping)
 
