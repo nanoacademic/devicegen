@@ -407,7 +407,7 @@ class DeviceGenerator:
 
         if  physical_volume not in phys_tags:
             phys_tags.append(physical_volume)
-            for idx , vol in enumerate(volumes):
+            for vol in volumes:
                 tags.append(vol)
             phys_tags = [(3, pt) for pt in phys_tags]
             gmsh.model.removePhysicalGroups(phys_tags)
