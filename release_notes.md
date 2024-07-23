@@ -1,5 +1,9 @@
 # DeviceGen release notes
 
+## devicegen 1.0.2
+
+Bumped version number to 1.0.2 to match the PyPI version number.
+
 ## devicegen 1.0.0
 
 - Improved devicegen packaging (it is now possible to import a standard DeviceGenerator using ``from devicegen import DeviceGenerator``).
