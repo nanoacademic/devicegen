@@ -401,7 +401,8 @@ class DeviceGenerator:
 
         phys_tags = self.get_tag_from_name(label, dim=3)
         tags = gmsh.model.getEntitiesForPhysicalGroup(3, phys_tags)
-        tags = tags.tolist()
+        if not isinstance(tags, list):
+            tags = tags.tolist()
         if isinstance(phys_tags, int):
             phys_tags = [phys_tags]
 
